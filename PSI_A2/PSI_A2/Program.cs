@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
+using System.IO;
+
 
 
 namespace PSI_A2
@@ -12,13 +9,45 @@ namespace PSI_A2
     {
         static void Main(string[] args)
         {
-            Bitmap damier = new Bitmap(@"..\..\..\Images\damier.bmp");
+            #region
+            /*//Bitmap damier = new Bitmap(@"..\..\..\Images\damier.bmp");
 
-            
+            byte[] file = File.ReadAllBytes(@"..\..\..\Images\damier.bmp");
+            Console.WriteLine("\n HEADER \n");
+            for (int i = 0; i < 14; i++)
+            {
+                Console.Write(file[i] + " ");
+            }
+            Console.WriteLine("\n HEADER INFO \n");
 
-            Console.WriteLine(damier);
-            damier.Save(@"..\..\..\Images\Tests_damier.bmp");
-            Console.ReadKey();
+            for (int i = 14; i < 54; i++)
+            {
+                Console.Write(file[i] + " ");
+
+            }
+
+
+
+
+
+            Console.WriteLine("\n IMAGE \n");
+
+            for (int i = 54; i < file.Length; i += 60)
+            {
+                for (int j = i; j < i + 60; j++)
+                {
+                    Console.WriteLine(file[j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+
+
+            //damier.Save(@"..\..\..\Images\Tests_damier.bmp");
+            //Equivalent de la save de bitmap
+            //File.WriteAllBytes(@"..\..\..\Images\Tests_damier.bmp",file);
+            Console.ReadKey();*/
+            #endregion
 
 
         }
