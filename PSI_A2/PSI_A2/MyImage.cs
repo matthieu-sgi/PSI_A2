@@ -64,8 +64,13 @@ namespace PSI_A2
             {
                 byte[] image_to_write = new byte[this.offset + (this.height * this.width)];
                 int counter = 0;
+                image_to_write[0] = 66;
+                image_to_write[1] = 77;
 
+                for(int i = 2; i < 6; i++)
+                {
 
+                }
 
 
                 for(int i = 0; i < this.image.GetLength(0); i++)
