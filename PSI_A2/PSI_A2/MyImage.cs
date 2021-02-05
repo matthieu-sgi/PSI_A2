@@ -18,7 +18,7 @@ namespace PSI_A2
         private int bits_by_Color;
         private byte[,] image;
 
-        public MyImage(string type, int taille, int offset, int width, int height, int bits_by_Color, int[,] image)
+        public MyImage(string type, int taille, int offset, int width, int height, int bits_by_Color, byte[,] image)
         {
             this.type = type;
             this.taille = taille;
@@ -84,6 +84,26 @@ namespace PSI_A2
 
             }
                 
+        }
+        public byte[] Convertir_Int_To_Endian(int entier)
+        {
+            int pui = 0;
+            int p = 0;
+
+            while (entier / (pui = Convert.ToInt32(Math.Pow(256, p))) >= 1)
+            {
+                p = p + 1;
+            }
+
+            p = p - 1;
+            byte[] tab = new byte[p + 1];
+            for (int i = tab.Length - 1; i >= 0; i--)
+            {
+                tab[i] = entier / (pui = Convert.ToInt32(Math.Pow(256, p)));
+                entier = entier - tab[i] * (pui = Convert.ToInt32(Math.Pow(256, p)));
+                p = p - 1;
+            }
+            return tab;
         }
 
         static int ByteToInt(byte[] tab,int pos, int length)
