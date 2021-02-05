@@ -1,0 +1,7 @@
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\bin\Debug\PSI_A2.exe.config
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\bin\Debug\PSI_A2.exe
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\bin\Debug\PSI_A2.pdb
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\obj\Debug\PSI_A2.csprojAssemblyReference.cache
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\obj\Debug\PSI_A2.csproj.CoreCompileInputs.cache
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\obj\Debug\PSI_A2.exe
+D:\VS Projets\A2 S2\PSI\PSI_A2\PSI_A2\PSI_A2\obj\Debug\PSI_A2.pdb
