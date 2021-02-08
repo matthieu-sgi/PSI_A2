@@ -17,6 +17,7 @@ namespace PSI_A2
         private int height;
         private int bits_by_Color;
         private byte[,] image;
+        private byte[] header;
 
         public MyImage(string type, int taille, int offset, int width, int height, int bits_by_Color, byte[,] image)
         {
@@ -38,12 +39,18 @@ namespace PSI_A2
             {
                 
                 
-                this.taille = Convertir_Endian_To_Int(ByteToInt(image_temp,2,4));
-                this.offset = Convertir_Endian_To_Int(ByteToInt(image_temp, 10, 4));
-                this.width = Convertir_Endian_To_Int(ByteToInt(image_temp, 18, 4))*3;
-                this.height = Convertir_Endian_To_Int(ByteToInt(image_temp, 22, 4))*3;
-                this.bits_by_Color = Convertir_Endian_To_Int(ByteToInt(image_temp, 28, 2));
+                this.taille = Convertir_Endian_To_Int(TableauByte(image_temp,2,4));
+                this.offset = Convertir_Endian_To_Int(TableauByte(image_temp, 10, 4));
+                this.width = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4))*3;
+                this.height = Convertir_Endian_To_Int(TableauByte(image_temp, 22, 4));
+                this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
                 this.image = new byte[this.height, this.width];
+                this.header = new byte[this.offset];
+
+                for(int i = 0; i < this.header; i++)
+                {
+                    this.header[i] = image_temp[i]; 
+                }
                 for (int i = this.offset; i < this.image.Length; i+=this.height)
                 {
                     for(int j = i; j < this.width; j++)
@@ -64,13 +71,20 @@ namespace PSI_A2
             {
                 byte[] image_to_write = new byte[this.offset + (this.height * this.width)];
                 int counter = 0;
-                image_to_write[0] = 66;
-                image_to_write[1] = 77;
-
-                for(int i = 2; i < 6; i++)
+                for(int i = 0; i < this.offset; i++)
                 {
-
+                    image_to_write[i] = this.header[i];
                 }
+
+                //Recalculating size, width and height
+                for (int i = 0; i < 4; i++)
+                {
+                    image_to_write[i + 14] = Convertir_Int_To_Endian(this.header.Length + (this.height * this.width))[i];
+                    image_to_write[i + 18] = Convertir_Int_To_Endian(this.height)[i];
+                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width)[i];
+                }
+
+                
 
 
                 for(int i = 0; i < this.image.GetLength(0); i++)
@@ -127,6 +141,14 @@ namespace PSI_A2
             }
             return Convert.ToInt32(retour);
         }
-
+        public byte[] TableauByte(byte[] tab,int pos, int length)
+        {
+            byte[] retour = new byte[length];
+            for(int i = pos;i<length;i++)
+            {
+                retour[pos - i] = tab[i];
+            }
+            return retour;
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace PSI_A2
             Console.ReadKey();*/
             #endregion
 
-
+            Console.ReadLine();
         }
     }
 }
