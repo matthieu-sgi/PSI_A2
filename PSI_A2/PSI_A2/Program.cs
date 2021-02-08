@@ -49,7 +49,15 @@ namespace PSI_A2
             Console.ReadKey();*/
             #endregion
 
-            Console.ReadLine();
+            string path = @"..\..\..\Images\Test001.bmp";
+            string writing_path = @"..\..\..\Images\Lalala.bmp";
+            
+            MyImage traie = new MyImage(path);
+            traie.FromImageToFile(writing_path);
+            
+
+
+            Console.ReadLine(); 
         }
     }
 }

@@ -47,20 +47,21 @@ namespace PSI_A2
                 this.image = new byte[this.height, this.width];
                 this.header = new byte[this.offset];
 
-                for(int i = 0; i < this.header; i++)
+                for(int i = 0; i < this.header.Length; i++)
                 {
                     this.header[i] = image_temp[i]; 
                 }
-                for (int i = this.offset; i < this.image.Length; i+=this.height)
+                for (int i = this.offset; i < this.image.GetLength(0); i++)
                 {
-                    for(int j = i; j < this.width; j++)
+                    for(int j = 0; j < this.image.GetLength(1); j++)
                     {
-                        this.image[i, j] = image_temp[j];
+                        this.image[i, j] = image_temp[j+i*this.width];
                     }
                 }
 
 
-
+             
+                
 
             }
         }
@@ -79,9 +80,9 @@ namespace PSI_A2
                 //Recalculating size, width and height
                 for (int i = 0; i < 4; i++)
                 {
-                    image_to_write[i + 14] = Convertir_Int_To_Endian(this.header.Length + (this.height * this.width))[i];
-                    image_to_write[i + 18] = Convertir_Int_To_Endian(this.height)[i];
-                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width)[i];
+                    image_to_write[i + 14] = Convertir_Int_To_Endian(this.header.Length + (this.height * this.width),4)[i];
+                    image_to_write[i + 18] = Convertir_Int_To_Endian(this.height,4)[i];
+                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width,4)[i];
                 }
 
                 
@@ -95,6 +96,7 @@ namespace PSI_A2
                         counter++;
                     }
                 }
+                File.WriteAllBytes(file, image_to_write);
 
             }
                 
@@ -102,51 +104,52 @@ namespace PSI_A2
 
         public int Convertir_Endian_To_Int(byte[] tab)
         {
-            int pui = 0;
+            
             int s = 0;
             for (int n = 0; n < tab.Length; n++)
             {
-                s = s + tab[n] * (pui = Convert.ToInt32(Math.Pow(256, n)));
+                s += tab[n] *Convert.ToInt32(Math.Pow(256, n));
             }
             return s;
         }
 
-        public byte[] Convertir_Int_To_Endian(int entier)
+        public byte[] Convertir_Int_To_Endian(int entier, int target_byte)
         {
-            int pui = 0;
+            
             int p = 0;
 
-            while (entier / (pui = Convert.ToInt32(Math.Pow(256, p))) >= 1)
+            while ((entier / Convert.ToInt32(Math.Pow(256, p)) >= 1))
             {
-                p = p + 1;
+                p ++;
             }
+            
+            p--;
+            
+            List<byte> tab = new List<byte>(p+1);
+            for (int i = tab.Count - 1; i >= 0; i--)
+            {
+                tab[i] = Convert.ToByte(entier / Convert.ToInt32(Math.Pow(256, p)));
+                entier = entier - tab[i] * Convert.ToInt32(Math.Pow(256, p));
+                p--;
+            }
+            
+            while(tab.Count < target_byte)
+            {
+                tab.Add(0);
+               
 
-            p = p - 1;
-            byte[] tab = new byte[p + 1];
-            for (int i = tab.Length - 1; i >= 0; i--)
-            {
-                tab[i] = entier / (pui = Convert.ToInt32(Math.Pow(256, p)));
-                entier = entier - tab[i] * (pui = Convert.ToInt32(Math.Pow(256, p)));
-                p = p - 1;
             }
-            return tab;
+            
+            return tab.ToArray();
         }
 
-        static int ByteToInt(byte[] tab,int pos, int length)
-        {
-            string retour = "";
-            for(int i = pos; i <= length+pos; i++)
-            {
-                retour += tab[i];
-            }
-            return Convert.ToInt32(retour);
-        }
+        
         public byte[] TableauByte(byte[] tab,int pos, int length)
         {
             byte[] retour = new byte[length];
-            for(int i = pos;i<length;i++)
+            for(int i = pos;i<pos + length;i++)
             {
-                retour[pos - i] = tab[i];
+                retour[i-pos] = tab[i];
             }
             return retour;
         }
