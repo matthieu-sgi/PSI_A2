@@ -153,5 +153,11 @@ namespace PSI_A2
             }
             return retour;
         }
+
+        public void Affiche()
+        {
+
+
+        }
     }
 }
