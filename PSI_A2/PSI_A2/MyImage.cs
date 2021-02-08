@@ -85,6 +85,18 @@ namespace PSI_A2
             }
                 
         }
+
+        public int Convertir_Endian_To_Int(byte[] tab)
+        {
+            int pui = 0;
+            int s = 0;
+            for (int n = 0; n < tab.Length; n++)
+            {
+                s = s + tab[n] * (pui = Convert.ToInt32(Math.Pow(256, n)));
+            }
+            return s;
+        }
+
         public byte[] Convertir_Int_To_Endian(int entier)
         {
             int pui = 0;
