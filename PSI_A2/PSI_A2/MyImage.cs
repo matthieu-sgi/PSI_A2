@@ -19,6 +19,8 @@ namespace PSI_A2
         private byte[,] image;
         private byte[] header;
 
+        
+
         public MyImage(string type, int taille, int offset, int width, int height, int bits_by_Color, byte[,] image)
         {
             this.type = type;
@@ -51,11 +53,11 @@ namespace PSI_A2
                 {
                     this.header[i] = image_temp[i]; 
                 }
-                for (int i = this.offset; i < this.image.GetLength(0); i++)
+                for (int i =0; i < this.image.GetLength(0); i++)
                 {
                     for(int j = 0; j < this.image.GetLength(1); j++)
                     {
-                        this.image[i, j] = image_temp[j+i*this.width];
+                        this.image[i, j] = image_temp[this.offset+ j+i*this.width];
                     }
                 }
 
@@ -64,6 +66,21 @@ namespace PSI_A2
                 
 
             }
+        }
+
+        public byte[,] Image
+        {
+            get { return this.image; }
+        }
+
+        public int Height
+        {
+            get { return this.height; }
+        }
+
+        public int Width
+        {
+            get { return this.width; }
         }
 
         public void FromImageToFile(string file)
@@ -93,7 +110,9 @@ namespace PSI_A2
                     for(int j= 0;j< this.image.GetLength(1); j++)
                     {
                         image_to_write[this.offset + counter] = this.image[i, j];
+                        //Console.WriteLine(image_to_write[this.offset + counter]);
                         counter++;
+                        
                     }
                 }
                 File.WriteAllBytes(file, image_to_write);
@@ -113,6 +132,21 @@ namespace PSI_A2
             return s;
         }
 
+        public byte[] Convert_Trying(int entier, int target_byte)
+        {
+            string hex = entier.ToString("X");
+            string temp = "";
+            for(int i = 0; i < target_byte; i++)
+            {
+                if(hex.Length/2 < i)
+                {
+                    temp += "00";
+                }
+                else temp += hex[i] + hex[i + 1];
+            }
+            return null;
+        }
+
         public byte[] Convertir_Int_To_Endian(int entier, int target_byte)
         {
             
@@ -126,10 +160,10 @@ namespace PSI_A2
             p--;
             
             List<byte> tab = new List<byte>(p+1);
-            for (int i = tab.Count - 1; i >= 0; i--)
+            for (int i = tab.Capacity - 1; i >= 0; i--)
             {
                 tab[i] = Convert.ToByte(entier / Convert.ToInt32(Math.Pow(256, p)));
-                entier = entier - tab[i] * Convert.ToInt32(Math.Pow(256, p));
+                entier -=  tab[i] * Convert.ToInt32(Math.Pow(256, p));
                 p--;
             }
             
@@ -156,7 +190,38 @@ namespace PSI_A2
 
         public void Affiche()
         {
+            Console.WriteLine("\n HEADER \n");
+            for (int i = 0; i < 14; i++)
+            {
+                Console.Write(header[i]+ " ");
+            }
+            Console.WriteLine("\n HEADER INFO \n");
 
+            for (int i = 14; i < 54; i++)
+            {
+                Console.Write(header[i] + " ");
+
+            }
+
+
+
+
+
+            Console.WriteLine("\n IMAGE \n");
+
+            for (int i = 0; i < image.GetLength(0); i ++)
+            {
+                for (int j = 0; j <image.GetLength(1); j++)
+                {
+                    Console.WriteLine(image[i,j] + " ");
+                }
+                Console.WriteLine();
+            }
+
+
+
+
+            
 
         }
     }
