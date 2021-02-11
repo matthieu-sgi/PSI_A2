@@ -65,25 +65,6 @@ namespace PSI_A2
             }
         }
 
-        public byte[,] Image
-        {
-            get { return this.image; }
-        }
-
-        public int Height
-        {
-            get { return this.height; }
-        }
-
-        public int Width
-        {
-            get { return this.width; }
-        }
-
-        public int Offset
-        {
-            get { return this.offset; }
-        }
 
         
 
