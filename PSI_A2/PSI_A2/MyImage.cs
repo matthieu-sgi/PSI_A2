@@ -44,17 +44,17 @@ namespace PSI_A2
                 this.height = Convertir_Endian_To_Int(TableauByte(image_temp, 22, 4));
                 this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
                 this.image = new byte[this.height, this.width];
-                this.header = new byte[this.offset-1];
+                this.header = new byte[this.offset];
 
                 for (int i = 0; i < this.header.Length; i++)
                 {
                     this.header[i] = image_temp[i];
                 }
-                for (int i = 0; i < this.image.GetLength(0); i++)
+                for (int i = 0; i < this.height; i++)
                 {
-                    for (int j = 0; j < this.image.GetLength(1); j++)
+                    for (int j = 0; j < this.width; j++)
                     {
-                        this.image[i, j] = image_temp[this.offset + j + i * this.image.GetLength(1)-1];
+                        this.image[i, j] = image_temp[this.offset + j + i * (this.width)];
                     }
                 }
 
@@ -80,13 +80,21 @@ namespace PSI_A2
             get { return this.width; }
         }
 
+        public int Offset
+        {
+            get { return this.offset; }
+        }
+
+        
+
         public void FromImageToFile(string file)
         {
             if (this.type == "BM")
             {
                 byte[] image_to_write = new byte[this.offset + (this.height * this.width)];
+                //Console.WriteLine(image_to_write.Length);
                 int counter = 0;
-                for (int i = 0; i < this.offset-1; i++)
+                for (int i = 0; i < this.offset; i++)
                 {
                     image_to_write[i] = this.header[i];
                 }
@@ -94,9 +102,12 @@ namespace PSI_A2
                 //Recalculating size, width and height
                 for (int i = 0; i < 4; i++)
                 {
-                    image_to_write[i + 14] = Convertir_Int_To_Endian(this.header.Length + (this.height * this.width), 4,new byte[4])[i];
+                    image_to_write[i + 34] = Convertir_Int_To_Endian(this.header.Length + (this.height * this.width), 4, new byte[4])[i];
                     image_to_write[i + 18] = Convertir_Int_To_Endian(this.height, 4, new byte[4])[i];
-                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width, 4, new byte[4])[i];
+                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width/3, 4, new byte[4])[i];
+                    
+
+
                 }
 
 
@@ -140,7 +151,7 @@ namespace PSI_A2
             else if (target_byte <= 0) return res;
             else if (entier / Math.Pow(256, target_byte - 1) >= 1)
             {
-                res[target_byte-1] = Convert.ToByte(entier / Math.Pow(256, target_byte - 1)-1);
+                res[target_byte-1] = Convert.ToByte(Math.Floor(entier / Math.Pow(256, target_byte - 1)));
                 return Convertir_Int_To_Endian(entier - (Convert.ToInt32(entier / Math.Pow(256, target_byte - 1))-1) * Convert.ToInt32(Math.Pow(256, target_byte - 1)), target_byte - 1, res);
             }
             else if (entier / Math.Pow(256, target_byte - 1) < 1)
@@ -185,6 +196,7 @@ namespace PSI_A2
 
         public byte[] TableauByte(byte[] tab, int pos, int length)
         {
+            
             byte[] retour = new byte[length];
             for (int i = pos; i < pos + length; i++)
             {
@@ -218,7 +230,7 @@ namespace PSI_A2
             {
                 for (int j = 0; j < image.GetLength(1); j++)
                 {
-                    Console.WriteLine(image[i, j] + " ");
+                    Console.Write(image[i, j] + " ");
                 }
                 Console.WriteLine();
             }

@@ -52,20 +52,28 @@ namespace PSI_A2
             string path = @"..\..\..\Images\Test001.bmp";
             string writing_path = @"..\..\..\Images\Lalala.bmp";
 
-
+            MyImage TEST = new MyImage("BM", 2902, 1312, 123, 13, 13, new byte[4, 4]);
+            byte[] tab = { 19,12,21,123,153,136, 19, 0, 0 };
+            //Console.WriteLine(TEST.Convertir_Endian_To_Int(tab));
+            /*foreach (byte i in TEST.TableauByte(tab, 3, 4))
+            {
+                Console.WriteLine(i);
+            }*/
             MyImage traie = new MyImage(path);
-             traie.FromImageToFile(writing_path);
-             
-             MyImage recup = new MyImage(writing_path);
-             recup.Affiche();
+            
+            traie.Affiche();
+            traie.FromImageToFile(writing_path);
 
-             Console.WriteLine(recup.Height);
-             Console.WriteLine(recup.Width);
+            /*MyImage recup = new MyImage(writing_path);
+            recup.Affiche();*/
 
-             
+            //Console.WriteLine(recup.Height);
+            //Console.WriteLine(recup.Width);
 
 
 
+
+            Console.WriteLine("Done");
             Console.ReadLine(); 
         }
     }
