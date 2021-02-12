@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 
@@ -10,7 +9,8 @@ namespace PSI_A2
         private string type;
         private int taille;
         private int offset;
-        private int width;
+        private int width_pixel;
+        private int width_byte;
         private int height;
         private int bits_by_Color;
         private byte[,] image;
@@ -23,7 +23,7 @@ namespace PSI_A2
             this.type = type;
             this.taille = taille;
             this.offset = offset;
-            this.width = width;
+            this.width_pixel = width;
             this.height = height;
             this.bits_by_Color = bits_by_Color;
             this.image = image;
@@ -40,10 +40,12 @@ namespace PSI_A2
 
                 this.taille = Convertir_Endian_To_Int(TableauByte(image_temp, 2, 4));
                 this.offset = Convertir_Endian_To_Int(TableauByte(image_temp, 10, 4));
-                this.width = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4)) * 3;
+                this.width_byte = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4)) * 3;
+                this.width_pixel = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4));
+
                 this.height = Convertir_Endian_To_Int(TableauByte(image_temp, 22, 4));
                 this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
-                this.image = new byte[this.height, this.width];
+                this.image = new byte[this.height, this.width_byte];
                 this.header = new byte[this.offset];
 
                 for (int i = 0; i < this.header.Length; i++)
@@ -52,9 +54,9 @@ namespace PSI_A2
                 }
                 for (int i = 0; i < this.height; i++)
                 {
-                    for (int j = 0; j < this.width; j++)
+                    for (int j = 0; j < this.width_byte; j++)
                     {
-                        this.image[i, j] = image_temp[this.offset + j + i * (this.width)];
+                        this.image[i, j] = image_temp[this.offset + j + i * (this.width_byte+ this.width_byte%4)];
                     }
                 }
 
@@ -64,15 +66,26 @@ namespace PSI_A2
 
             }
         }
+        public int Width_Pixel
+        {
+            get { return this.width_pixel; }
+        }
+
+        public int Height_Pixel
+        {
+            get { return this.height; }
+        }
 
 
-        
+
 
         public void FromImageToFile(string file)
         {
             if (this.type == "BM")
             {
-                byte[] image_to_write = new byte[this.offset + (this.height * this.width)];
+                byte[] image_to_write = new byte[this.offset + (this.height * this.width_byte)];
+
+
                 //Console.WriteLine(image_to_write.Length);
                 int counter = 0;
                 for (int i = 0; i < this.offset; i++)
@@ -83,15 +96,21 @@ namespace PSI_A2
                 //Recalculating size, width and height
                 for (int i = 0; i < 4; i++)
                 {
-                    image_to_write[i + 34] = Convertir_Int_To_Endian(this.header.Length + (this.height * this.width), 4, new byte[4])[i];
+                    image_to_write[i + 2] = Convertir_Int_To_Endian(this.taille, 4, new byte[4])[i];
                     image_to_write[i + 18] = Convertir_Int_To_Endian(this.height, 4, new byte[4])[i];
-                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width/3, 4, new byte[4])[i];
-                    
+                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width_pixel, 4, new byte[4])[i];
+
 
 
                 }
-
-
+                for(int i = 24; i < this.offset; i++)
+                {
+                    image_to_write[i] = 0;
+                }
+                //Console.WriteLine(this.height);
+                //Console.WriteLine(this.width/3);
+                //Console.WriteLine(image_to_write.Length);
+                //Console.WriteLine(this.width_pixel);
 
 
                 for (int i = 0; i < this.image.GetLength(0); i++)
@@ -103,7 +122,14 @@ namespace PSI_A2
                         counter++;
 
                     }
+                    for (int j = 0; j < this.width_byte % 4; j++)
+                    {
+                        image_to_write[this.offset + counter + j] = 0;
+                        counter++;
+                    }
+                    
                 }
+                
                 File.WriteAllBytes(file, image_to_write);
 
             }
@@ -132,15 +158,15 @@ namespace PSI_A2
             else if (target_byte <= 0) return res;
             else if (entier / Math.Pow(256, target_byte - 1) >= 1)
             {
-                res[target_byte-1] = Convert.ToByte(Math.Floor(entier / Math.Pow(256, target_byte - 1)));
-                return Convertir_Int_To_Endian(entier - (Convert.ToInt32(entier / Math.Pow(256, target_byte - 1))-1) * Convert.ToInt32(Math.Pow(256, target_byte - 1)), target_byte - 1, res);
+                res[target_byte - 1] = Convert.ToByte(Math.Floor(entier / Math.Pow(256, target_byte - 1)));
+                return Convertir_Int_To_Endian(entier - (Convert.ToInt32(entier / Math.Pow(256, target_byte - 1)) - 1) * Convert.ToInt32(Math.Pow(256, target_byte - 1)), target_byte - 1, res);
             }
             else if (entier / Math.Pow(256, target_byte - 1) < 1)
             {
-                res[target_byte-1] = 0;
-                return Convertir_Int_To_Endian(entier, target_byte-1, res);
+                res[target_byte - 1] = 0;
+                return Convertir_Int_To_Endian(entier, target_byte - 1, res);
             }
-            
+
             else return res;
         }
 
@@ -175,9 +201,48 @@ namespace PSI_A2
         }*/
 
 
+        public void Nuance_de_Gris()
+        {
+            for (int i = 0; i < this.image.GetLength(0); i += 3)
+            {
+                for (int j = 0; j < this.image.GetLength(1); j += 3)
+                {
+                    byte moyenne = Convert.ToByte((this.image[i, j] + this.image[i + 1, j + 1] + this.image[i + 2, j + 2]) / 3);
+                    this.image[i, j] = moyenne;
+                    this.image[i + 1, i + 1] = moyenne;
+                    this.image[i + 2, j + 2] = moyenne;
+
+
+
+                }
+            }
+
+        }
+
+        public void Noir_et_Blanc()
+        {
+
+        }
+
+        public void Resize()
+        {
+
+        }
+
+        public void Rotation()
+        {
+
+        }
+
+        public void Miror()
+        {
+
+        }
+
+
         public byte[] TableauByte(byte[] tab, int pos, int length)
         {
-            
+
             byte[] retour = new byte[length];
             for (int i = pos; i < pos + length; i++)
             {
@@ -186,34 +251,53 @@ namespace PSI_A2
             return retour;
         }
 
-        public void Affiche()
+        public void Affiche(bool only_header)
         {
-            Console.WriteLine("\n HEADER \n");
-            for (int i = 0; i < 14; i++)
+            if (!only_header)
             {
-                Console.Write(header[i] + " ");
-            }
-            Console.WriteLine("\n HEADER INFO \n");
-
-            for (int i = 14; i < 54; i++)
-            {
-                Console.Write(header[i] + " ");
-
-            }
-
-
-
-
-
-            Console.WriteLine("\n IMAGE \n");
-
-            for (int i = 0; i < image.GetLength(0); i++)
-            {
-                for (int j = 0; j < image.GetLength(1); j++)
+                Console.WriteLine("\n HEADER \n");
+                for (int i = 0; i < 14; i++)
                 {
-                    Console.Write(image[i, j] + " ");
+                    Console.Write(header[i] + " ");
                 }
-                Console.WriteLine();
+                Console.WriteLine("\n HEADER INFO \n");
+
+                for (int i = 14; i < 54; i++)
+                {
+                    Console.Write(header[i] + " ");
+
+                }
+
+
+
+
+
+                Console.WriteLine("\n IMAGE \n");
+
+                for (int i = 0; i < image.GetLength(0); i++)
+                {
+                    for (int j = 0; j < image.GetLength(1); j++)
+                    {
+                        Console.Write(image[i, j] + " ");
+                    }
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("\n HEADER \n");
+                for (int i = 0; i < 14; i++)
+                {
+                    Console.Write(header[i] + " ");
+                }
+                Console.WriteLine("\n HEADER INFO \n");
+
+                for (int i = 14; i < 54; i++)
+                {
+                    Console.Write(header[i] + " ");
+
+                }
+
             }
 
 
