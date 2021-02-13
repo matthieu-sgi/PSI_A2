@@ -49,13 +49,13 @@ namespace PSI_A2
             Console.ReadKey();*/
             #endregion
 
-            string path = @"..\..\..\Images\coco.bmp";
+            string path = @"..\..\..\Images\Tigre.bmp";
             string writing_path = @"..\..\..\Images\Lalala.bmp";
 
             
             
             MyImage traie = new MyImage(path);
-            traie.Noir_et_Blanc();
+            traie.Miror(false);
             //traie.Affiche(true);
             //Console.WriteLine(traie.Height_Pixel);
             traie.FromImageToFile(writing_path);

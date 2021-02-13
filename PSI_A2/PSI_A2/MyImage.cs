@@ -284,9 +284,39 @@ namespace PSI_A2
 
         }
 
-        public void Miror()
+        public void Miror(bool horizontal)
         {
+            byte[,] image_temp = new byte[this.image.GetLength(0), this.image.GetLength(1)];
+            if (horizontal)
+            {
 
+                for (int i = 0; i < image_temp.GetLength(0); i++)
+                {
+                    for (int j = 0; j < image_temp.GetLength(1); j+=3)
+                    {
+                        image_temp[i, j] = this.image[i, this.image.GetLength(1) - 1 - j-2];
+                        image_temp[i,j+1] = this.image[i, this.image.GetLength(1) - 1 - j-1];
+                        image_temp[i,j+2] = this.image[i, this.image.GetLength(1) - 1 - j];
+                    }
+                }
+            }else
+            {
+                for (int i = 0; i < image_temp.GetLength(0); i++)
+                {
+                    for (int j = 0; j < image_temp.GetLength(1); j ++)
+                    {
+                        image_temp[i, j] = this.image[this.image.GetLength(0)-1-i, j];
+                        
+                    }
+                }
+            }
+            for (int i = 0; i < image_temp.GetLength(0); i++)
+            {
+                for (int j = 0; j < image_temp.GetLength(1); j++)
+                {
+                    this.image[i, j] = image_temp[i, j];
+                }
+            }
         }
 
 
