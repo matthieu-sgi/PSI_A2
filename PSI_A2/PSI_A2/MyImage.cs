@@ -274,8 +274,22 @@ namespace PSI_A2
 
 
 
-        public void Resize()
+        public void Resize(double factor)
         {
+            
+            if( factor > 0)
+            {
+                byte[,] image_temp = new byte[Convert.ToInt32(this.image.GetLength(0) * factor), Convert.ToInt32(this.image.GetLength(1) * factor)];
+                for(int i = 0; i < image_temp.GetLength(0); i++)
+                {
+                    for(int j= 0; j < image_temp.GetLength(1); j++)
+                    {
+                        
+                    }
+                }
+
+            }
+
 
         }
 

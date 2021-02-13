@@ -56,6 +56,7 @@ namespace PSI_A2
             
             MyImage traie = new MyImage(path);
             traie.Miror(false);
+            traie.Miror(true);
             //traie.Affiche(true);
             //Console.WriteLine(traie.Height_Pixel);
             traie.FromImageToFile(writing_path);
