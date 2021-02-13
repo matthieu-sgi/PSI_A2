@@ -56,7 +56,7 @@ namespace PSI_A2
                 {
                     for (int j = 0; j < this.width_byte; j++)
                     {
-                        this.image[i, j] = image_temp[this.offset + j + i * (this.width_byte+ this.width_byte%4)];
+                        this.image[i, j] = image_temp[this.offset + j + i * (this.width_byte + this.width_byte % 4)];
                     }
                 }
 
@@ -96,17 +96,14 @@ namespace PSI_A2
                 //Recalculating size, width and height
                 for (int i = 0; i < 4; i++)
                 {
-                    image_to_write[i + 2] = Convertir_Int_To_Endian(this.taille, 4, new byte[4])[i];
-                    image_to_write[i + 18] = Convertir_Int_To_Endian(this.height, 4, new byte[4])[i];
-                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.width_pixel, 4, new byte[4])[i];
+                    image_to_write[i + 2] = Convertir_Int_To_Endian(this.taille)[i];
+                    image_to_write[i + 18] = Convertir_Int_To_Endian(this.width_pixel)[i];
+                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.height)[i];
 
 
 
                 }
-                for(int i = 24; i < this.offset; i++)
-                {
-                    image_to_write[i] = 0;
-                }
+
                 //Console.WriteLine(this.height);
                 //Console.WriteLine(this.width/3);
                 //Console.WriteLine(image_to_write.Length);
@@ -127,9 +124,9 @@ namespace PSI_A2
                         image_to_write[this.offset + counter + j] = 0;
                         counter++;
                     }
-                    
+
                 }
-                
+
                 File.WriteAllBytes(file, image_to_write);
 
             }
@@ -147,7 +144,30 @@ namespace PSI_A2
             return s;
         }
 
-        public byte[] Convertir_Int_To_Endian(int entier, int target_byte, byte[] res)
+        public byte[] Convertir_Int_To_Endian(long entier)
+        {
+            int p = 0;
+            while ((entier / Convert.ToInt64(Math.Pow(256, p)) >= 1))
+            {
+                p++;
+            }
+            p--;
+            byte[] retour = new byte[p + 4 - p % 4];
+            for (int i = 0; i < retour.Length; i++)
+            {
+                retour[i] = 0;
+            }
+            for (int i = p; i >= 0; i--)
+            {
+                retour[i] = Convert.ToByte(entier / Convert.ToInt64(Math.Pow(256, p)));
+                entier -= retour[i] * Convert.ToInt64(Math.Pow(256, p));
+                p--;
+            }
+            return retour;
+        }
+
+        #region Test de Fonctions "Convertir_Int_To_Endian"
+        /*public byte[] Convertir_Int_To_Endian(int entier, int target_byte, byte[] res)
         {
 
 
@@ -168,7 +188,7 @@ namespace PSI_A2
             }
 
             else return res;
-        }
+        }*/
 
         /*public byte[] Convertir_Int_To_Endian(int entier, int target_byte)
         {
@@ -199,18 +219,21 @@ namespace PSI_A2
 
             return tab.ToArray();
         }*/
+        #endregion
 
 
         public void Nuance_de_Gris()
         {
-            for (int i = 0; i < this.image.GetLength(0); i += 3)
+
+            for (int i = 0; i < this.image.GetLength(0); i++)
             {
                 for (int j = 0; j < this.image.GetLength(1); j += 3)
                 {
-                    byte moyenne = Convert.ToByte((this.image[i, j] + this.image[i + 1, j + 1] + this.image[i + 2, j + 2]) / 3);
+                    byte moyenne = Convert.ToByte((this.image[i, j] + this.image[i, j + 1] + this.image[i, j + 2]) / 3);
+
                     this.image[i, j] = moyenne;
-                    this.image[i + 1, i + 1] = moyenne;
-                    this.image[i + 2, j + 2] = moyenne;
+                    this.image[i, j + 1] = moyenne;
+                    this.image[i, j + 2] = moyenne;
 
 
 
@@ -221,8 +244,35 @@ namespace PSI_A2
 
         public void Noir_et_Blanc()
         {
+            for (int i = 0; i < this.image.GetLength(0); i++)
+            {
+                for (int j = 0; j < this.image.GetLength(1); j += 3)
+                {
+                    byte moyenne = Convert.ToByte((this.image[i, j] + this.image[i, j + 1] + this.image[i, j + 2]) / 3);
+
+                    if (moyenne < 255 / 2)
+                    {
+                        this.image[i, j] = 0;
+                        this.image[i, j + 1] = 0;
+                        this.image[i, j + 2] = 0;
+                    }
+                    else
+                    {
+                        this.image[i, j] = 255;
+                        this.image[i, j + 1] = 255;
+                        this.image[i, j + 2] = 255;
+                    }
+
+
+                }
+            }
+
+
 
         }
+
+
+
 
         public void Resize()
         {
