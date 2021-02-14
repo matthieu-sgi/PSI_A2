@@ -274,17 +274,30 @@ namespace PSI_A2
 
 
 
-        public void Resize(double factor)
+        public void Resize(int new_height,int new_width)
         {
             
-            if( factor > 0)
+            if( new_height > 0 && new_width>0)
             {
-                byte[,] image_temp = new byte[Convert.ToInt32(this.image.GetLength(0) * factor), Convert.ToInt32(this.image.GetLength(1) * factor)];
+                byte[,] image_temp = new byte[new_height, new_width];
+                for(int i = 0; i < this.image.GetLength(0); i++)
+                {
+                    for(int j= 0; j < this.image.GetLength(1); j++)
+                    {
+                        image_temp[] = this.image[i, j];
+                        
+                    }
+                }
+
                 for(int i = 0; i < image_temp.GetLength(0); i++)
                 {
                     for(int j= 0; j < image_temp.GetLength(1); j++)
                     {
-                        
+                        if(image_temp[i,j] == 0)
+                        {
+
+
+                        }
                     }
                 }
 
@@ -293,8 +306,10 @@ namespace PSI_A2
 
         }
 
-        public void Rotation()
+        public void Rotation(double angle_deg)
         {
+
+
 
         }
 
