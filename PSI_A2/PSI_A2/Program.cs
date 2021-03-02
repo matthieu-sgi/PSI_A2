@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Drawing;
 
 
 
@@ -49,18 +50,23 @@ namespace PSI_A2
             Console.ReadKey();*/
             #endregion
 
-            string path = @"..\..\..\Images\Tigre.bmp";
+            string path = @"..\..\..\Images\tigre.bmp";
             string writing_path = @"..\..\..\Images\Lalala.bmp";
 
             
             
+            
             MyImage traie = new MyImage(path);
-            traie.Miror(false);
-            traie.Miror(true);
+            traie.Rotation(Math.PI / 2);
+            //traie.Affiche(false, true);
+            //traie.Miror(false);
+            //traie.Miror(true);
             //traie.Affiche(true);
             //Console.WriteLine(traie.Height_Pixel);
-            traie.FromImageToFile(writing_path);
-
+            //traie.Nuance_de_Gris();
+            //traie.Resize(400, 400);
+            //traie.FromImageToFile(writing_path,true);
+            //traie.FromImageToFile(writing_path, true);
             
 
 

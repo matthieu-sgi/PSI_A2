@@ -16,6 +16,8 @@ namespace PSI_A2
         private byte[,] image;
         private byte[] header;
 
+        private Pixel[,] pixel_image;
+
 
 
         public MyImage(string type, int taille, int offset, int width, int height, int bits_by_Color, byte[,] image)
@@ -47,18 +49,36 @@ namespace PSI_A2
                 this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
                 this.image = new byte[this.height, this.width_byte];
                 this.header = new byte[this.offset];
+                this.pixel_image = new Pixel[this.height, this.width_pixel];
 
                 for (int i = 0; i < this.header.Length; i++)
                 {
                     this.header[i] = image_temp[i];
                 }
+                //Je laisse le truc d'avant par sécurité 
                 for (int i = 0; i < this.height; i++)
                 {
                     for (int j = 0; j < this.width_byte; j++)
                     {
                         this.image[i, j] = image_temp[this.offset + j + i * (this.width_byte + this.width_byte % 4)];
+                        
                     }
                 }
+
+                //J'instaure le nouveau système
+                int counter = 0;
+                for (int i = 0; i < this.height; i++)
+                {
+                    for (int j = 0; j < this.width_pixel; j++)
+                    {
+                        byte red= image_temp[this.offset +counter];
+                        byte green = image_temp[this.offset +counter+1];
+                        byte blue = image_temp[this.offset +counter+ 2];
+                        counter += 3 + (this.width_byte % 4);
+                        this.pixel_image[i, j] = new Pixel(red, green, blue);
+                    }
+                }
+
 
 
 
@@ -79,7 +99,7 @@ namespace PSI_A2
 
 
 
-        public void FromImageToFile(string file)
+        public void FromImageToFile(string file, bool using_pixel_class)
         {
             if (this.type == "BM")
             {
@@ -109,22 +129,42 @@ namespace PSI_A2
                 //Console.WriteLine(image_to_write.Length);
                 //Console.WriteLine(this.width_pixel);
 
-
-                for (int i = 0; i < this.image.GetLength(0); i++)
+                if (!using_pixel_class)
                 {
-                    for (int j = 0; j < this.image.GetLength(1); j++)
+                    for (int i = 0; i < this.image.GetLength(0); i++)
                     {
-                        image_to_write[this.offset + counter] = this.image[i, j];
-                        //Console.WriteLine(image_to_write[this.offset + counter]);
-                        counter++;
+                        for (int j = 0; j < this.image.GetLength(1); j++)
+                        {
+                            image_to_write[this.offset + counter] = this.image[i, j];
+                            //Console.WriteLine(image_to_write[this.offset + counter]);
+                            counter++;
+
+                        }
+                        for (int j = 0; j < this.width_byte % 4; j++)
+                        {
+                            image_to_write[this.offset + counter + j] = 0;
+                            counter++;
+                        }
 
                     }
-                    for (int j = 0; j < this.width_byte % 4; j++)
+                }
+                else
+                {
+                    for(int i = 0; i < pixel_image.GetLength(0); i++)
                     {
-                        image_to_write[this.offset + counter + j] = 0;
-                        counter++;
+                        for(int j = 0; j < pixel_image.GetLength(1); j++)
+                        {
+                            image_to_write[this.offset + counter] = this.pixel_image[i, j].R;
+                            image_to_write[this.offset + counter+1] = this.pixel_image[i, j].G;
+                            image_to_write[this.offset + counter + 2] = this.pixel_image[i, j].B;
+                            counter += 3;
+                        }
+                        for (int j = 0; j < this.width_byte % 4; j++)
+                        {
+                            image_to_write[this.offset + counter + j] = 0;
+                            counter++;
+                        }
                     }
-
                 }
 
                 File.WriteAllBytes(file, image_to_write);
@@ -276,38 +316,45 @@ namespace PSI_A2
 
         public void Resize(int new_height,int new_width)
         {
-            
-            if( new_height > 0 && new_width>0)
+
+            Pixel[,] new_matrix = new Pixel[new_height, new_width];
+            for(int i = 0; i < new_matrix.GetLength(0); i++)
             {
-                byte[,] image_temp = new byte[new_height, new_width];
-                for(int i = 0; i < this.image.GetLength(0); i++)
+                for(int j = 0; j < new_matrix.GetLength(1); j++)
                 {
-                    for(int j= 0; j < this.image.GetLength(1); j++)
-                    {
-                        image_temp[] = this.image[i, j];
-                        
-                    }
+                    int new_x = (int)(((double)i * (double)this.pixel_image.GetLength(0)) / (double)new_matrix.GetLength(0));
+                    int new_y = (int)(((double)j * (double)this.pixel_image.GetLength(1)) / (double)new_matrix.GetLength(1));
+                    new_matrix[i,j] = new Pixel(this.pixel_image[new_x, new_y].R, this.pixel_image[new_x, new_y].G, this.pixel_image[new_x, new_y].B);
+                    
                 }
-
-                for(int i = 0; i < image_temp.GetLength(0); i++)
-                {
-                    for(int j= 0; j < image_temp.GetLength(1); j++)
-                    {
-                        if(image_temp[i,j] == 0)
-                        {
-
-
-                        }
-                    }
-                }
-
             }
 
+            this.pixel_image = new_matrix;
+            this.height = new_height;
+            this.width_byte = new_width*3;
+            this.width_pixel = new_width;
 
         }
 
-        public void Rotation(double angle_deg)
+        public void Rotation(double angle_rad)
         {
+            int[] center = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
+            int new_height = 0;
+            int new_width = 0;
+            int[] temp = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
+            for (int i = 0; i < this.pixel_image.GetLength(0); i += pixel_image.GetLength(0) - 1)
+            {
+                for (int j = 0; j < this.pixel_image.GetLength(1); j += pixel_image.GetLength(1) - 1)
+                {
+
+
+                    double r = Math.Sqrt(Math.Pow(i - center[0], 2) + Math.Pow(j - center[1], 2));
+                    double theta = Math.Atan2(j, i) + angle_rad;
+                    temp[0] = (temp[0] < center[0] + r * Math.Cos(theta)) ? (int)(center[0] + r * Math.Cos(theta)) : temp[0];
+                    temp[1] = (temp[1] < center[1] + r * Math.Sin(theta)) ? (int)(center[1] + r * Math.Sin(theta)) : temp[1];
+                }
+            }
+            Console.WriteLine(temp[0] + " " + temp[1]);
 
 
 
@@ -360,53 +407,105 @@ namespace PSI_A2
             return retour;
         }
 
-        public void Affiche(bool only_header)
+        public void Affiche(bool only_header,bool using_pixel_class)
         {
-            if (!only_header)
+            if (!using_pixel_class)
             {
-                Console.WriteLine("\n HEADER \n");
-                for (int i = 0; i < 14; i++)
+                if (!only_header)
                 {
-                    Console.Write(header[i] + " ");
-                }
-                Console.WriteLine("\n HEADER INFO \n");
-
-                for (int i = 14; i < 54; i++)
-                {
-                    Console.Write(header[i] + " ");
-
-                }
-
-
-
-
-
-                Console.WriteLine("\n IMAGE \n");
-
-                for (int i = 0; i < image.GetLength(0); i++)
-                {
-                    for (int j = 0; j < image.GetLength(1); j++)
+                    Console.WriteLine("\n HEADER \n");
+                    for (int i = 0; i < 14; i++)
                     {
-                        Console.Write(image[i, j] + " ");
+                        Console.Write(header[i] + " ");
                     }
-                    Console.WriteLine();
+                    Console.WriteLine("\n HEADER INFO \n");
+
+                    for (int i = 14; i < 54; i++)
+                    {
+                        Console.Write(header[i] + " ");
+
+                    }
+
+
+
+
+
+                    Console.WriteLine("\n IMAGE \n");
+
+                    for (int i = 0; i < image.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < image.GetLength(1); j++)
+                        {
+                            Console.Write(image[i, j] + " ");
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\n HEADER \n");
+                    for (int i = 0; i < 14; i++)
+                    {
+                        Console.Write(header[i] + " ");
+                    }
+                    Console.WriteLine("\n HEADER INFO \n");
+
+                    for (int i = 14; i < 54; i++)
+                    {
+                        Console.Write(header[i] + " ");
+
+                    }
+
                 }
             }
             else
             {
-                Console.WriteLine("\n HEADER \n");
-                for (int i = 0; i < 14; i++)
+                if (!only_header)
                 {
-                    Console.Write(header[i] + " ");
-                }
-                Console.WriteLine("\n HEADER INFO \n");
+                    Console.WriteLine("\n HEADER \n");
+                    for (int i = 0; i < 14; i++)
+                    {
+                        Console.Write(header[i] + " ");
+                    }
+                    Console.WriteLine("\n HEADER INFO \n");
 
-                for (int i = 14; i < 54; i++)
+                    for (int i = 14; i < 54; i++)
+                    {
+                        Console.Write(header[i] + " ");
+
+                    }
+
+
+
+
+
+                    Console.WriteLine("\n IMAGE \n");
+
+                    for (int i = 0; i < this.pixel_image.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < this.pixel_image.GetLength(1); j++)
+                        {
+                            Console.Write("(" + this.pixel_image[i, j].R + ", " + this.pixel_image[i,j].G+", "+this.pixel_image[i,j].B+')');
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                else
                 {
-                    Console.Write(header[i] + " ");
+                    Console.WriteLine("\n HEADER \n");
+                    for (int i = 0; i < 14; i++)
+                    {
+                        Console.Write(header[i] + " ");
+                    }
+                    Console.WriteLine("\n HEADER INFO \n");
+
+                    for (int i = 14; i < 54; i++)
+                    {
+                        Console.Write(header[i] + " ");
+
+                    }
 
                 }
-
             }
 
 
