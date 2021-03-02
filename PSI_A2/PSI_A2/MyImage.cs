@@ -150,20 +150,21 @@ namespace PSI_A2
                 }
                 else
                 {
-                    for(int i = 0; i < pixel_image.GetLength(0); i++)
+                    int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
+                    for (int i = 0; i < pixel_image.GetLength(0); i++)
                     {
-                        for(int j = 0; j < pixel_image.GetLength(1); j++)
+                        for(int j = 0; j < width_to_save; j++)
                         {
-                            image_to_write[this.offset + counter] = this.pixel_image[i, j].R;
-                            image_to_write[this.offset + counter+1] = this.pixel_image[i, j].G;
-                            image_to_write[this.offset + counter + 2] = this.pixel_image[i, j].B;
-                            counter += 3;
+                            if (j < pixel_image.GetLength(1))
+                            {
+                                image_to_write[this.offset + i * width_to_save + j*3] = this.pixel_image[i, j].R;
+                                image_to_write[this.offset + i * width_to_save  + j*3 + 1] = this.pixel_image[i, j].G;
+                                image_to_write[this.offset + i * width_to_save + j*3 + 2] = this.pixel_image[i, j].B;
+                            }
+                            
+                            
                         }
-                        for (int j = 0; j < this.width_byte % 4; j++)
-                        {
-                            image_to_write[this.offset + counter + j] = 0;
-                            counter++;
-                        }
+                        
                     }
                 }
 
@@ -339,9 +340,9 @@ namespace PSI_A2
         public void Rotation(double angle_rad)
         {
             int[] center = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
-            int new_height = 0;
-            int new_width = 0;
-            int[] temp = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
+            int new_height = this.pixel_image.GetLength(0) / 2;
+            int new_width = this.pixel_image.GetLength(1) / 2;
+            
             for (int i = 0; i < this.pixel_image.GetLength(0); i += pixel_image.GetLength(0) - 1)
             {
                 for (int j = 0; j < this.pixel_image.GetLength(1); j += pixel_image.GetLength(1) - 1)
@@ -349,12 +350,41 @@ namespace PSI_A2
 
 
                     double r = Math.Sqrt(Math.Pow(i - center[0], 2) + Math.Pow(j - center[1], 2));
-                    double theta = Math.Atan2(j, i) + angle_rad;
-                    temp[0] = (temp[0] < center[0] + r * Math.Cos(theta)) ? (int)(center[0] + r * Math.Cos(theta)) : temp[0];
-                    temp[1] = (temp[1] < center[1] + r * Math.Sin(theta)) ? (int)(center[1] + r * Math.Sin(theta)) : temp[1];
+                    double theta = Math.Atan2(i-center[0], j-center[1]) + angle_rad;
+                    if( new_width< center[0] + r * Math.Cos(theta))
+                    {
+                        new_width = (int)(center[0] + r * Math.Cos(theta));
+                    }
+                    if(new_height < center[1] + r * Math.Sin(theta))
+                    {
+                        new_height = (int)(center[1] + r * Math.Sin(theta));
+                    }
+                    
                 }
             }
-            Console.WriteLine(temp[0] + " " + temp[1]);
+            Console.WriteLine(new_height + " " + new_width);
+            Console.ReadKey();
+            Pixel[,] new_matrix = new Pixel[new_height, new_width];
+            int[] new_center = { new_matrix.GetLength(0) / 2, new_matrix.GetLength(1) / 2 };
+            for(int i = 0; i < new_matrix.GetLength(0); i++)
+            {
+                for(int j= 0; j < new_matrix.GetLength(1); j++)
+                {
+                    double rayon = Math.Sqrt(Math.Pow(i - new_center[0], 2) + Math.Pow(j - new_center[1], 2));
+                    double theta = Math.Atan2(i - new_center[0], j - new_center[1]) - angle_rad;
+                    int new_x = (int)(center[0] + rayon * Math.Cos(theta));
+                    int new_y = (int)(center[1] + rayon * Math.Sin(theta));
+                    if(new_x >=0 && new_x<this.pixel_image.GetLength(0)&&new_y>=0 && new_y < this.pixel_image.GetLength(1))
+                    {
+                        new_matrix[i, j] = this.pixel_image[new_x, new_y];
+                    }
+
+                }
+            }
+            this.pixel_image = new_matrix;
+            this.width_pixel = new_width;
+            this.height = new_height;
+            this.width_byte = (new_width) * 3;
 
 
 
