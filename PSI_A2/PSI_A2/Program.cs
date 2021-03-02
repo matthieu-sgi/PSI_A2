@@ -57,7 +57,7 @@ namespace PSI_A2
             
             
             MyImage traie = new MyImage(path);
-            traie.Rotation(0);
+            traie.Rotation(Math.PI/4);
             //traie.Affiche(false, true);
             //traie.Miror(false);
             //traie.Miror(true);

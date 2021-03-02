@@ -103,7 +103,9 @@ namespace PSI_A2
         {
             if (this.type == "BM")
             {
-                byte[] image_to_write = new byte[this.offset + (this.height * this.width_byte)];
+                int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
+                this.taille = this.offset + width_to_save * pixel_image.GetLength(0);
+                byte[] image_to_write = new byte[this.taille];
 
 
                 //Console.WriteLine(image_to_write.Length);
@@ -117,8 +119,8 @@ namespace PSI_A2
                 for (int i = 0; i < 4; i++)
                 {
                     image_to_write[i + 2] = Convertir_Int_To_Endian(this.taille)[i];
-                    image_to_write[i + 18] = Convertir_Int_To_Endian(this.width_pixel)[i];
-                    image_to_write[i + 22] = Convertir_Int_To_Endian(this.height)[i];
+                    image_to_write[i + 18] = Convertir_Int_To_Endian(pixel_image.GetLength(1))[i];
+                    image_to_write[i + 22] = Convertir_Int_To_Endian(pixel_image.GetLength(0))[i];
 
 
 
@@ -150,7 +152,7 @@ namespace PSI_A2
                 }
                 else
                 {
-                    int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
+                    
                     for (int i = 0; i < pixel_image.GetLength(0); i++)
                     {
                         for(int j = 0; j < width_to_save; j++)
@@ -331,9 +333,7 @@ namespace PSI_A2
             }
 
             this.pixel_image = new_matrix;
-            this.height = new_height;
-            this.width_byte = new_width*3;
-            this.width_pixel = new_width;
+            
 
         }
 
@@ -342,7 +342,10 @@ namespace PSI_A2
             int[] center = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
             int new_height = this.pixel_image.GetLength(0) / 2;
             int new_width = this.pixel_image.GetLength(1) / 2;
-            
+            int x_max = 0;
+            int x_min = 0;
+            int y_max = 0;
+            int y_min = 0;
             for (int i = 0; i < this.pixel_image.GetLength(0); i += pixel_image.GetLength(0) - 1)
             {
                 for (int j = 0; j < this.pixel_image.GetLength(1); j += pixel_image.GetLength(1) - 1)
@@ -351,17 +354,16 @@ namespace PSI_A2
 
                     double r = Math.Sqrt(Math.Pow(i - center[0], 2) + Math.Pow(j - center[1], 2));
                     double theta = Math.Atan2(i-center[0], j-center[1]) + angle_rad;
-                    if( new_width< center[0] + r * Math.Cos(theta))
-                    {
-                        new_width = (int)(center[0] + r * Math.Cos(theta));
-                    }
-                    if(new_height < center[1] + r * Math.Sin(theta))
-                    {
-                        new_height = (int)(center[1] + r * Math.Sin(theta));
-                    }
+                    x_max = (x_max < r * Math.Cos(theta)) ? (int)(r * Math.Cos(theta)) : x_max;
+                    x_min = (x_min > r * Math.Cos(theta)) ? (int)(r * Math.Cos(theta)) : x_min;
+                    y_max = (y_max < r * Math.Sin(theta)) ? (int)(r * Math.Sin(theta)) : y_max;
+                    y_min = (y_min > r * Math.Sin(theta)) ? (int)(r * Math.Sin(theta)) : y_min;
                     
+
                 }
             }
+            new_height = y_max - y_min+1;
+            new_width = x_max - x_min +1;
             Console.WriteLine(new_height + " " + new_width);
             Console.ReadKey();
             Pixel[,] new_matrix = new Pixel[new_height, new_width];
@@ -371,7 +373,7 @@ namespace PSI_A2
                 for(int j= 0; j < new_matrix.GetLength(1); j++)
                 {
                     double rayon = Math.Sqrt(Math.Pow(i - new_center[0], 2) + Math.Pow(j - new_center[1], 2));
-                    double theta = Math.Atan2(i - new_center[0], j - new_center[1]) - angle_rad;
+                    double theta = Math.Atan2(j-new_center[1], i - new_center[0]) - angle_rad;
                     int new_x = (int)(center[0] + rayon * Math.Cos(theta));
                     int new_y = (int)(center[1] + rayon * Math.Sin(theta));
                     if(new_x >=0 && new_x<this.pixel_image.GetLength(0)&&new_y>=0 && new_y < this.pixel_image.GetLength(1))
@@ -382,10 +384,7 @@ namespace PSI_A2
                 }
             }
             this.pixel_image = new_matrix;
-            this.width_pixel = new_width;
-            this.height = new_height;
-            this.width_byte = (new_width) * 3;
-
+            
 
 
         }
