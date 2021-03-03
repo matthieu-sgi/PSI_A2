@@ -56,21 +56,22 @@ namespace PSI_A2
             
             
             
-            MyImage traie = new MyImage(path);
-            //
-           traie.blur();
-            //traie.Rotation(Math.PI/4);
-            //traie.Affiche(false, true);
-            //traie.Miror(false);
-            //traie.Miror(false);
-            //traie.Affiche(true);
-            //Console.WriteLine(traie.Height_Pixel);
-            //traie.Nuance_de_Gris();
-            //traie.Resize(400, 400);
-            //traie.edges_detection();
+            MyImage image = new MyImage(path);
+            
 
-            traie.FromImageToFile(writing_path,true);
-            //traie.FromImageToFile(writing_path, true);
+            //image.Rotation(Math.PI/4);
+            //image.Affiche(false, true);
+            //image.Miror(false);
+            //image.Miror(false);
+            //image.Affiche(true);
+            //Console.WriteLine(traie.Height_Pixel);
+            //image.Nuance_de_Gris();
+            //image.Resize(400, 400);
+            //image.edges_detection();
+            //image.blur();
+
+            image.FromImageToFile(writing_path,true);
+            //image.FromImageToFile(writing_path, true);
             
 
 

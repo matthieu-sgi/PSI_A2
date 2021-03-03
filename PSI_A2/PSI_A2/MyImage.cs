@@ -395,7 +395,8 @@ namespace PSI_A2
 
         public void blur()
         {
-            int[,] mat_blur = { { 4, 4, 4 }, { 4, 4, 4 }, { 4, 4, 4 } };
+            //int[,] mat_blur = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
+            int[,] mat_blur = { { 1, 4, 6, 4, 1 }, { 4, 16, 24, 16, 4 }, { 6, 24, 36, 24, 6 }, { 4, 16, 24, 16, 4 } };
             this.pixel_image = Convolution(mat_blur);
 
 
@@ -419,42 +420,54 @@ namespace PSI_A2
             return retour;
         }
 
-        //ATTENTION CA NE FONCTIONNE QUE POUR UNE MATRICE DE CONVOLUTION 3x3
+        
         public Pixel[,] Convolution(int[,] mat_conv)
         {
             Pixel[,] new_matrix = new Pixel[pixel_image.GetLength(0), pixel_image.GetLength(1)];
-            for (int i = 0; i < new_matrix.GetLength(0); i++)
+            new_matrix = this.pixel_image;
+            int somme_matrix_convo = 0;
+            int decalage = 0;
+            for (int i = 0; i < mat_conv.GetLength(0); i++)
             {
-                for (int j = 0; j < new_matrix.GetLength(1); j++)
+                for (int j = 0; j < mat_conv.GetLength(1); j++)
                 {
-                    int somme = 0;
-                    int decalage = 0;
+                    somme_matrix_convo += mat_conv[i, j];
+
+                }
+            }
+
+            if (somme_matrix_convo == 0)
+            {
+                somme_matrix_convo = 1;
+                decalage = 128;
+            }
+            decalage = (somme_matrix_convo< 0) ? 255 : decalage;
+
+
+
+            for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - mat_conv.GetLength(0) / 2; i++)
+            {
+                for (int j = mat_conv.GetLength(1) / 2; j < new_matrix.GetLength(1) - mat_conv.GetLength(1) / 2; j++)
+                {
+
+                    
                     int ope_red = 0;
                     int ope_green = 0;
                     int ope_blue = 0;
-                    for (int k = -1; k < 2; k++)
+                    
+
+                    for (int k = -mat_conv.GetLength(0) / 2; k < mat_conv.GetLength(0) / 2; k++)
                     {
-                        for (int l = -1; l < 2; l++)
+                        for (int l = -mat_conv.GetLength(1) / 2; l < mat_conv.GetLength(1) / 2; l++)
                         {
-                            ope_red = ((i + k >= 0 && i + k < new_matrix.GetLength(0)) && (j + l >= 0 && j + l < new_matrix.GetLength(1))) ? ope_red + this.pixel_image[i + k, j + l].R * mat_conv[k + 1, l + 1] : ope_red;
-                            ope_green = ((i + k >= 0 && i + k < new_matrix.GetLength(0)) && (j + l >= 0 && j + l < new_matrix.GetLength(1))) ? ope_green + this.pixel_image[i + k, j + l].G * mat_conv[k + 1, l + 1] : ope_green;
-                            ope_blue = ((i + k >= 0 && i + k < new_matrix.GetLength(0)) && (j + l >= 0 && j + l < new_matrix.GetLength(1))) ? ope_blue + this.pixel_image[i + k, j + l].R * mat_conv[k + 1, l + 1] : ope_blue;
-                            somme += mat_conv[k + 1, l + 1];
+                            ope_red += (this.pixel_image[i + k, j + l].R * mat_conv[k + mat_conv.GetLength(0) / 2, l + mat_conv.GetLength(1) / 2])/somme_matrix_convo;
+                            ope_green += (this.pixel_image[i + k, j + l].G * mat_conv[k + mat_conv.GetLength(0) / 2, l + mat_conv.GetLength(1) / 2])/somme_matrix_convo;
+                            ope_blue += (this.pixel_image[i + k, j + l].R * mat_conv[k + mat_conv.GetLength(0) / 2, l + mat_conv.GetLength(1) / 2])/somme_matrix_convo;
+
                         }
                     }
-                    if (somme == 0)
-                    {
-                        somme = 1;
-                        //decalage = 128;
-                    }/*
-                    else if(somme < 0)
-                    {
-                        somme = 1;
-                        decalage = 255;
-                    }*/
-                    //decalage = (somme == 0) ? 128 : decalage;
-                    decalage = (somme < 0) ?  255 : decalage;
-                    new_matrix[i, j] = new Pixel((byte)((ope_red / (somme))+decalage), (byte)((ope_blue / (somme)) + decalage),(byte) ((ope_green / somme)+decalage));
+                    
+                    new_matrix[i, j] = new Pixel((byte)(ope_red+decalage), (byte)(ope_blue+decalage), (byte)(ope_green+decalage));
                 }
             }
             return new_matrix;
