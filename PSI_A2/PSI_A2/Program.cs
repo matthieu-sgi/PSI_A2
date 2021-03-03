@@ -50,21 +50,25 @@ namespace PSI_A2
             Console.ReadKey();*/
             #endregion
 
-            string path = @"..\..\..\Images\tigre.bmp";
+            string path = @"..\..\..\Images\lena.bmp";
             string writing_path = @"..\..\..\Images\Lalala.bmp";
 
             
             
             
             MyImage traie = new MyImage(path);
+            //
+           traie.blur();
             //traie.Rotation(Math.PI/4);
             //traie.Affiche(false, true);
             //traie.Miror(false);
-            traie.Miror(true);
+            //traie.Miror(false);
             //traie.Affiche(true);
             //Console.WriteLine(traie.Height_Pixel);
             //traie.Nuance_de_Gris();
             //traie.Resize(400, 400);
+            //traie.edges_detection();
+
             traie.FromImageToFile(writing_path,true);
             //traie.FromImageToFile(writing_path, true);
             

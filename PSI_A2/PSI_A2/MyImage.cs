@@ -55,10 +55,10 @@ namespace PSI_A2
                 {
                     this.header[i] = image_temp[i];
                 }
-                
+
 
                 //J'instaure le nouveau système
-                
+
 
                 int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
                 for (int i = 0; i < pixel_image.GetLength(0); i++)
@@ -68,8 +68,8 @@ namespace PSI_A2
                         if (j < pixel_image.GetLength(1))
                         {
                             this.pixel_image[i, j].R = image_temp[this.offset + i * width_to_save + j * 3];
-                            this.pixel_image[i, j].G= image_temp[this.offset + i * width_to_save + j * 3 + 1];
-                            this.pixel_image[i, j].B= image_temp[this.offset + i * width_to_save + j * 3 + 2]   ;
+                            this.pixel_image[i, j].G = image_temp[this.offset + i * width_to_save + j * 3 + 1];
+                            this.pixel_image[i, j].B = image_temp[this.offset + i * width_to_save + j * 3 + 2];
                         }
 
 
@@ -100,12 +100,12 @@ namespace PSI_A2
             {
                 int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
                 this.taille = this.offset + width_to_save * pixel_image.GetLength(0);
-                
+
                 byte[] image_to_write = new byte[this.taille];
 
 
                 //Console.WriteLine(image_to_write.Length);
-                
+
                 for (int i = 0; i < this.offset; i++)
                 {
                     image_to_write[i] = this.header[i];
@@ -122,7 +122,7 @@ namespace PSI_A2
 
                 }
 
-                
+
 
 
 
@@ -393,6 +393,20 @@ namespace PSI_A2
             this.pixel_image = image_temp;
         }
 
+        public void blur()
+        {
+            int[,] mat_blur = { { 4, 4, 4 }, { 4, 4, 4 }, { 4, 4, 4 } };
+            this.pixel_image = Convolution(mat_blur);
+
+
+        }
+
+        public void edges_detection()
+        {
+            int[,] mat = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+            this.pixel_image = Convolution(mat);
+        }
+
 
         public byte[] TableauByte(byte[] tab, int pos, int length)
         {
@@ -403,6 +417,47 @@ namespace PSI_A2
                 retour[i - pos] = tab[i];
             }
             return retour;
+        }
+
+        //ATTENTION CA NE FONCTIONNE QUE POUR UNE MATRICE DE CONVOLUTION 3x3
+        public Pixel[,] Convolution(int[,] mat_conv)
+        {
+            Pixel[,] new_matrix = new Pixel[pixel_image.GetLength(0), pixel_image.GetLength(1)];
+            for (int i = 0; i < new_matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < new_matrix.GetLength(1); j++)
+                {
+                    int somme = 0;
+                    int decalage = 0;
+                    int ope_red = 0;
+                    int ope_green = 0;
+                    int ope_blue = 0;
+                    for (int k = -1; k < 2; k++)
+                    {
+                        for (int l = -1; l < 2; l++)
+                        {
+                            ope_red = ((i + k >= 0 && i + k < new_matrix.GetLength(0)) && (j + l >= 0 && j + l < new_matrix.GetLength(1))) ? ope_red + this.pixel_image[i + k, j + l].R * mat_conv[k + 1, l + 1] : ope_red;
+                            ope_green = ((i + k >= 0 && i + k < new_matrix.GetLength(0)) && (j + l >= 0 && j + l < new_matrix.GetLength(1))) ? ope_green + this.pixel_image[i + k, j + l].G * mat_conv[k + 1, l + 1] : ope_green;
+                            ope_blue = ((i + k >= 0 && i + k < new_matrix.GetLength(0)) && (j + l >= 0 && j + l < new_matrix.GetLength(1))) ? ope_blue + this.pixel_image[i + k, j + l].R * mat_conv[k + 1, l + 1] : ope_blue;
+                            somme += mat_conv[k + 1, l + 1];
+                        }
+                    }
+                    if (somme == 0)
+                    {
+                        somme = 1;
+                        //decalage = 128;
+                    }/*
+                    else if(somme < 0)
+                    {
+                        somme = 1;
+                        decalage = 255;
+                    }*/
+                    //decalage = (somme == 0) ? 128 : decalage;
+                    decalage = (somme < 0) ?  255 : decalage;
+                    new_matrix[i, j] = new Pixel((byte)((ope_red / (somme))+decalage), (byte)((ope_blue / (somme)) + decalage),(byte) ((ope_green / somme)+decalage));
+                }
+            }
+            return new_matrix;
         }
 
         public void Affiche(bool only_header)
