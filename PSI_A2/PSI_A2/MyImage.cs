@@ -15,6 +15,7 @@ namespace PSI_A2
         private int bits_by_Color;
         private byte[,] image;
         private byte[] header;
+        private bool rigth_file = true;
 
         private Pixel[,] pixel_image;
 
@@ -33,54 +34,65 @@ namespace PSI_A2
 
         public MyImage(string myfile)
         {
-            byte[] image_temp = File.ReadAllBytes(myfile);
-            this.type = (image_temp[0] == 66 && image_temp[1] == 77) ? "BM" : "-1";
 
-            if (this.type == "BM")
+            try
             {
+                byte[] image_temp = File.ReadAllBytes(myfile);
 
 
-                this.taille = Convertir_Endian_To_Int(TableauByte(image_temp, 2, 4));
-                this.offset = Convertir_Endian_To_Int(TableauByte(image_temp, 10, 4));
-                this.width_byte = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4)) * 3;
-                this.width_pixel = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4));
+                this.type = (image_temp[0] == 66 && image_temp[1] == 77) ? "BM" : "-1";
 
-                this.height = Convertir_Endian_To_Int(TableauByte(image_temp, 22, 4));
-                this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
-                this.image = new byte[this.height, this.width_byte];
-                this.header = new byte[this.offset];
-                this.pixel_image = new Pixel[this.height, this.width_pixel];
-
-                for (int i = 0; i < this.header.Length; i++)
+                if (this.type == "BM")
                 {
-                    this.header[i] = image_temp[i];
-                }
 
 
-                //J'instaure le nouveau système
+                    this.taille = Convertir_Endian_To_Int(TableauByte(image_temp, 2, 4));
+                    this.offset = Convertir_Endian_To_Int(TableauByte(image_temp, 10, 4));
+                    this.width_byte = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4)) * 3;
+                    this.width_pixel = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4));
 
+                    this.height = Convertir_Endian_To_Int(TableauByte(image_temp, 22, 4));
+                    this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
+                    this.image = new byte[this.height, this.width_byte];
+                    this.header = new byte[this.offset];
+                    this.pixel_image = new Pixel[this.height, this.width_pixel];
 
-                int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
-                for (int i = 0; i < pixel_image.GetLength(0); i++)
-                {
-                    for (int j = 0; j < width_to_save; j++)
+                    for (int i = 0; i < this.header.Length; i++)
                     {
-                        if (j < pixel_image.GetLength(1))
-                        {
-                            this.pixel_image[i, j].R = image_temp[this.offset + i * width_to_save + j * 3];
-                            this.pixel_image[i, j].G = image_temp[this.offset + i * width_to_save + j * 3 + 1];
-                            this.pixel_image[i, j].B = image_temp[this.offset + i * width_to_save + j * 3 + 2];
-                        }
+                        this.header[i] = image_temp[i];
+                    }
 
+
+                    //J'instaure le nouveau système
+
+
+                    int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
+                    for (int i = 0; i < pixel_image.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < width_to_save; j++)
+                        {
+                            if (j < pixel_image.GetLength(1))
+                            {
+                                this.pixel_image[i, j].R = image_temp[this.offset + i * width_to_save + j * 3];
+                                this.pixel_image[i, j].G = image_temp[this.offset + i * width_to_save + j * 3 + 1];
+                                this.pixel_image[i, j].B = image_temp[this.offset + i * width_to_save + j * 3 + 2];
+                            }
+
+
+                        }
 
                     }
 
+
+
                 }
-
-
-
+            }catch (FileNotFoundException)
+            {
+                Console.WriteLine("Votre nom de fichier n'est pas bon");
+                this.rigth_file = false;
+                
             }
-        }
+            }
         public int Width_Pixel
         {
             get { return this.pixel_image.GetLength(1); }
@@ -90,11 +102,14 @@ namespace PSI_A2
         {
             get { return this.pixel_image.GetLength(0); }
         }
+        public bool Right_File
+        {
+            get { return rigth_file; }
+        }
 
 
 
-
-        public void FromImageToFile(string file, bool using_pixel_class)
+        public void FromImageToFile(string file)
         {
             if (this.type == "BM")
             {
@@ -314,6 +329,7 @@ namespace PSI_A2
 
         public void Rotation(double angle_rad)
         {
+            angle_rad = (angle_rad / 180.0) * Math.PI;
             int[] center = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
             int new_height = this.pixel_image.GetLength(0) / 2;
             int new_width = this.pixel_image.GetLength(1) / 2;
@@ -339,8 +355,7 @@ namespace PSI_A2
             }
             new_height = y_max - y_min + 1;
             new_width = x_max - x_min + 1;
-            Console.WriteLine(new_height + " " + new_width);
-            Console.ReadKey();
+            
             Pixel[,] new_matrix = new Pixel[new_height, new_width];
             int[] new_center = { new_matrix.GetLength(0) / 2, new_matrix.GetLength(1) / 2 };
             for (int i = 0; i < new_matrix.GetLength(0); i++)
@@ -393,18 +408,30 @@ namespace PSI_A2
             this.pixel_image = image_temp;
         }
 
-        public void blur()
+        public void Blur()
         {
-            //int[,] mat_blur = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
-            int[,] mat_blur = { { 1, 4, 6, 4, 1 }, { 4, 16, 24, 16, 4 }, { 6, 24, 36, 24, 6 }, { 4, 16, 24, 16, 4 } };
+            int[,] mat_blur = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
+            //int[,] mat_blur = { { 1, 4, 6, 4, 1 }, { 4, 16, 24, 16, 4 }, { 6, 24, 36, 24, 6 }, { 4, 16, 24, 16, 4 } };
             this.pixel_image = Convolution(mat_blur);
 
 
         }
 
-        public void edges_detection()
+        public void Edges_detection()
         {
             int[,] mat = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+            this.pixel_image = Convolution(mat);
+        }
+
+        public void Repoussage()
+        {
+            int[,] mat = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 1 } };
+            this.pixel_image = Convolution(mat);
+        }
+
+        public void EdgesReinforcement()
+        {
+            int[,] mat = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
             this.pixel_image = Convolution(mat);
         }
 
@@ -423,8 +450,8 @@ namespace PSI_A2
         
         public Pixel[,] Convolution(int[,] mat_conv)
         {
-            Pixel[,] new_matrix = new Pixel[pixel_image.GetLength(0), pixel_image.GetLength(1)];
-            new_matrix = this.pixel_image;
+             
+            Pixel[,] new_matrix = this.pixel_image;
             int somme_matrix_convo = 0;
             int decalage = 0;
             for (int i = 0; i < mat_conv.GetLength(0); i++)
@@ -439,10 +466,10 @@ namespace PSI_A2
             if (somme_matrix_convo == 0)
             {
                 somme_matrix_convo = 1;
-                decalage = 128;
+                decalage = 15;
             }
-            decalage = (somme_matrix_convo< 0) ? 255 : decalage;
-
+            decalage = (somme_matrix_convo < 0) ? 255 : decalage;
+            somme_matrix_convo = 9;
 
 
             for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - mat_conv.GetLength(0) / 2; i++)
@@ -456,18 +483,18 @@ namespace PSI_A2
                     int ope_blue = 0;
                     
 
-                    for (int k = -mat_conv.GetLength(0) / 2; k < mat_conv.GetLength(0) / 2; k++)
+                    for (int k = -mat_conv.GetLength(0) / 2; k <= mat_conv.GetLength(0) / 2; k++)
                     {
-                        for (int l = -mat_conv.GetLength(1) / 2; l < mat_conv.GetLength(1) / 2; l++)
+                        for (int l = -mat_conv.GetLength(1) / 2; l <= mat_conv.GetLength(1) / 2; l++)
                         {
-                            ope_red += (this.pixel_image[i + k, j + l].R * mat_conv[k + mat_conv.GetLength(0) / 2, l + mat_conv.GetLength(1) / 2])/somme_matrix_convo;
-                            ope_green += (this.pixel_image[i + k, j + l].G * mat_conv[k + mat_conv.GetLength(0) / 2, l + mat_conv.GetLength(1) / 2])/somme_matrix_convo;
-                            ope_blue += (this.pixel_image[i + k, j + l].R * mat_conv[k + mat_conv.GetLength(0) / 2, l + mat_conv.GetLength(1) / 2])/somme_matrix_convo;
+                            ope_red += this.pixel_image[i + k, j + l].R * mat_conv[k + (int)(mat_conv.GetLength(0) / 2), l + (int)(mat_conv.GetLength(1) / 2)];
+                            ope_green += this.pixel_image[i + k, j + l].G * mat_conv[k + (int)(mat_conv.GetLength(0) / 2), l + (int)(mat_conv.GetLength(1) / 2)];
+                            ope_blue += this.pixel_image[i + k, j + l].B * mat_conv[k + (int)(mat_conv.GetLength(0) / 2), l + (int)(mat_conv.GetLength(1) / 2)];
 
                         }
                     }
                     
-                    new_matrix[i, j] = new Pixel((byte)(ope_red+decalage), (byte)(ope_blue+decalage), (byte)(ope_green+decalage));
+                    new_matrix[i, j] = new Pixel((byte)((ope_red/somme_matrix_convo) + decalage), (byte)((ope_blue/somme_matrix_convo) +decalage), (byte)((ope_green/somme_matrix_convo) + decalage));
                 }
             }
             return new_matrix;
