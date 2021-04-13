@@ -74,9 +74,9 @@ namespace PSI_A2
                         {
                             if (j < pixel_image.GetLength(1))
                             {
-                                this.pixel_image[i, j].R = image_temp[this.offset + i * width_to_save + j * 3];
+                                this.pixel_image[i, j].B = image_temp[this.offset + i * width_to_save + j * 3];
                                 this.pixel_image[i, j].G = image_temp[this.offset + i * width_to_save + j * 3 + 1];
-                                this.pixel_image[i, j].B = image_temp[this.offset + i * width_to_save + j * 3 + 2];
+                                this.pixel_image[i, j].R = image_temp[this.offset + i * width_to_save + j * 3 + 2];
                             }
 
 
@@ -158,9 +158,9 @@ namespace PSI_A2
                     {
                         if (j < pixel_image.GetLength(1))
                         {
-                            image_to_write[this.offset + i * width_to_save + j * 3] = this.pixel_image[i, j].R;
+                            image_to_write[this.offset + i * width_to_save + j * 3] = this.pixel_image[i, j].B;
                             image_to_write[this.offset + i * width_to_save + j * 3 + 1] = this.pixel_image[i, j].G;
-                            image_to_write[this.offset + i * width_to_save + j * 3 + 2] = this.pixel_image[i, j].B;
+                            image_to_write[this.offset + i * width_to_save + j * 3 + 2] = this.pixel_image[i, j].R;
                         }
 
 
