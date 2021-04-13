@@ -22,6 +22,7 @@ namespace PSI_A2
 
         public Pixel(string color)
         {
+            color = color.ToLower();
             switch (color)
             {
                 case "b":

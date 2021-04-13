@@ -74,7 +74,9 @@ namespace PSI_A2
             }
             else path += nom_image;*/
             MyImage image = new MyImage(path);
-            
+
+
+            #region Menu sympathique
 
             while (exit != "exit" && image.Right_File)
             {
@@ -226,6 +228,7 @@ namespace PSI_A2
 
                 }
             }
+            #endregion
 
             //image.Rotation(Math.PI / 4);
             //image.Affiche(false);
@@ -241,12 +244,12 @@ namespace PSI_A2
 
             //image.FromImageToFile(writing_path);
 
-            
 
 
 
 
-            //Console.WriteLine("Save and Done");
+
+            Console.WriteLine("Save and Done");
             Console.ReadKey();
         }
     }
