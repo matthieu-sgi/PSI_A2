@@ -36,7 +36,7 @@ namespace PSI_A2
             }
             else path += nom_image;*/
             MyImage image = new MyImage(path);
-
+            QrCode qr = new QrCode("none", writing_path);
 
             #region Menu sympathique
 
@@ -193,7 +193,7 @@ namespace PSI_A2
             #endregion
 
             //image.Rotation(Math.PI / 4);
-            //image.Affiche(false);
+            //image.Affiche(true);
             //image.Miror(false);
             //image.Miror(false);
             //image.Affiche(true);
@@ -205,13 +205,12 @@ namespace PSI_A2
             //image.Blur();
 
             //image.FromImageToFile(writing_path);
+            qr.Affiche();
+            //qr.Qr_Save();
 
 
 
 
-
-
-            Console.WriteLine("Save and Done");
             Console.ReadKey();
         }
     }

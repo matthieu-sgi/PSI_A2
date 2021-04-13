@@ -171,6 +171,7 @@ namespace PSI_A2
 
                 File.WriteAllBytes(file, image_to_write);
 
+                Console.WriteLine("Save and Done");
             }
 
         }
@@ -199,7 +200,7 @@ namespace PSI_A2
             return s;
         }
 
-        private byte[] Convertir_Int_To_Endian(long entier)
+        static public byte[] Convertir_Int_To_Endian(long entier)
         {
             int p = 0;
             while ((entier / Convert.ToInt64(Math.Pow(256, p)) >= 1))

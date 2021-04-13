@@ -6,23 +6,45 @@ namespace PSI_A2
     {
         private string my_string;
 
-        private string my_path;
+        private string writing_path;
         private MyImage qr;
 
 
-        public QrCode(string _my_string, string _my_path)
+        public QrCode(string _my_string, string writing_path)
         {
             this.my_string = _my_string.ToUpper();
-            this.my_path = _my_path;
+            this.writing_path = writing_path;
+
+            QrCode_Generator();
         }
 
-       /* private byte[] Header_Generator()
+        private byte[] Header_Generator()
         {
+            byte[] header = new byte[54];
+            for (int i = 0; i < 4; i++)
+            {
+                byte[] tab_temp = { 0, 18, 11, 0 };
+                header[10+i] = MyImage.Convertir_Int_To_Endian(54)[i];
+                header[14 + i] = MyImage.Convertir_Int_To_Endian(40)[i];
+                //header[38 + i] = tab_temp[i];
+                //header[42 + i] = tab_temp[i];
+
+            }
             
+            for(int i = 0; i < 2; i++)
+            {
+                header[26 + i] = MyImage.Convertir_Int_To_Endian(1)[i];
+                header[28 + i] = MyImage.Convertir_Int_To_Endian(24)[i];
+            }
 
 
+            return header;
+        }
 
-        }*/
+        public void Qr_Save()
+        {
+            this.qr.FromImageToFile(this.writing_path);
+        }
 
         private void Mutual_Part(Pixel[,] qr)
         {
@@ -34,14 +56,14 @@ namespace PSI_A2
                     {
                         qr[i, j] = new Pixel("w");
                         qr[i, j + qr.GetLength(1) - 7] = new Pixel("w");
-                        qr[i - qr.GetLength(0) - 7, j] = new Pixel("w");
+                        qr[i + qr.GetLength(0) - 7, j] = new Pixel("w");
 
                     }
                     else
                     {
                         qr[i, j] = new Pixel("b");
                         qr[i, j + qr.GetLength(1) - 7] = new Pixel("b");
-                        qr[i - qr.GetLength(0) - 7, j] = new Pixel("b");
+                        qr[i + qr.GetLength(0) - 7, j] = new Pixel("b");
                     }
                 }
             }
@@ -74,7 +96,8 @@ namespace PSI_A2
             {
                 Pixel[,] pixel_qr = new Pixel[21, 21];
                 MandatoryPart_V1(pixel_qr);
-                //this.qr = new MyImage("BM",)
+                this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
+                
 
             }
             else if (this.my_string.Length < 48)
@@ -90,7 +113,22 @@ namespace PSI_A2
 
         }
 
+        public void Affiche()
+        {
+            byte[] header = Header_Generator();
 
+            for(int i = 0; i < 14; i++)
+            {
+                Console.Write(header[i]+ " ");
+            }
+            Console.WriteLine();
+
+            for(int i = 14; i < header.Length; i++)
+            {
+                Console.Write(header[i] + " ");
+            }
+
+        }
 
         private string BinaryConverterFromInt(int num, int taille = -1)
         {
