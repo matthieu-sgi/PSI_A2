@@ -50,8 +50,8 @@ namespace PSI_A2
             Console.ReadKey();*/
             #endregion
 
-            string path = @"..\..\..\Images\";
-            string writing_path = @"..\..\..\Images\";
+            string path = @"..\..\..\Images\tigre.bmp";
+            string writing_path = @"..\..\..\Images\test.bmp";
 
 
 
@@ -59,8 +59,8 @@ namespace PSI_A2
 
 
 
-            string exit = "";
-            Console.WriteLine("Veuillez entrer le nom du fichier de résultat en spécifiant l'extension (.bmp) : ");
+            string exit = "exit";
+            /*Console.WriteLine("Veuillez entrer le nom du fichier de résultat en spécifiant l'extension (.bmp) : ");
             string nom_image = Console.ReadLine();
             writing_path += nom_image;
 
@@ -72,7 +72,7 @@ namespace PSI_A2
                 path += "lena.bmp";
 
             }
-            else path += nom_image;
+            else path += nom_image;*/
             MyImage image = new MyImage(path);
             
 
@@ -89,6 +89,7 @@ namespace PSI_A2
                                     "\n9- Détection des contours" +
                                     "\n10- Repoussage" +
                                     "\n11- Renforcement des bords" +
+                                    "\n12- Histogramme" +
                                     "\nEntrer \"exit\" pour quitter");
                 exit = Console.ReadLine();
                 switch (exit)
@@ -205,6 +206,13 @@ namespace PSI_A2
                         Console.ReadKey();
                         Console.Clear();
                         break;
+                    case "12":
+                        image.Histogramme();
+                        image.FromImageToFile(writing_path);
+                        Console.WriteLine("Save and done");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
                     case "exit":
                         Console.WriteLine("Au revoir");
                         Console.ReadKey();
@@ -218,27 +226,28 @@ namespace PSI_A2
 
                 }
             }
-            
-            //image.Rotation(Math.PI/4);
-            //image.Affiche(false, true);
+
+            //image.Rotation(Math.PI / 4);
+            //image.Affiche(false);
             //image.Miror(false);
             //image.Miror(false);
             //image.Affiche(true);
             //Console.WriteLine(traie.Height_Pixel);
             //image.Nuance_de_Gris();
-            //image.Resize(400, 400);
-            //image.edges_detection();
-            //image.blur();
+            //image.Resize(500, 500);
+            //image.Repoussage();
+            //image.Edges_detection();
+            //image.Blur();
 
-            //image.FromImageToFile(writing_path,true);
-            //image.FromImageToFile(writing_path, true);
+            //image.FromImageToFile(writing_path);
+
             
 
 
 
 
-            /*Console.WriteLine("Save and Done");
-            Console.ReadKey(); */
+            //Console.WriteLine("Save and Done");
+            Console.ReadKey();
         }
     }
 }

@@ -12,8 +12,8 @@ namespace PSI_A2
         private int width_pixel;
         private int width_byte;
         private int height;
-        private int bits_by_Color;
-        private byte[,] image;
+        //private int bits_by_Color;
+        //private byte[,] image;
         private byte[] header;
         private bool rigth_file = true;
 
@@ -21,15 +21,16 @@ namespace PSI_A2
 
 
 
-        public MyImage(string type, int taille, int offset, int width, int height, int bits_by_Color, byte[,] image)
+        public MyImage(string type, int offset, byte[] header, Pixel[,] image)
         {
             this.type = type;
-            this.taille = taille;
+            //this.taille = taille;
             this.offset = offset;
-            this.width_pixel = width;
-            this.height = height;
-            this.bits_by_Color = bits_by_Color;
-            this.image = image;
+            this.header = header;
+            //this.width_pixel = width;
+            //this.height = height;
+            //this.bits_by_Color = bits_by_Color;
+            this.pixel_image = image;
         }
 
         public MyImage(string myfile)
@@ -52,8 +53,8 @@ namespace PSI_A2
                     this.width_pixel = Convertir_Endian_To_Int(TableauByte(image_temp, 18, 4));
 
                     this.height = Convertir_Endian_To_Int(TableauByte(image_temp, 22, 4));
-                    this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
-                    this.image = new byte[this.height, this.width_byte];
+                    //this.bits_by_Color = Convertir_Endian_To_Int(TableauByte(image_temp, 28, 2));
+                    //this.image = new byte[this.height, this.width_byte];
                     this.header = new byte[this.offset];
                     this.pixel_image = new Pixel[this.height, this.width_pixel];
 
@@ -86,13 +87,15 @@ namespace PSI_A2
 
 
                 }
-            }catch (FileNotFoundException)
+            }
+            catch (FileNotFoundException)
             {
                 Console.WriteLine("Votre nom de fichier n'est pas bon");
+                Console.ReadKey();
                 this.rigth_file = false;
-                
+
             }
-            }
+        }
         public int Width_Pixel
         {
             get { return this.pixel_image.GetLength(1); }
@@ -107,6 +110,11 @@ namespace PSI_A2
             get { return rigth_file; }
         }
 
+        public Pixel[,] Pixel_image
+        {
+            get { return this.pixel_image; }
+        }
+
 
 
         public void FromImageToFile(string file)
@@ -115,8 +123,10 @@ namespace PSI_A2
             {
                 int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
                 this.taille = this.offset + width_to_save * pixel_image.GetLength(0);
-
+                
                 byte[] image_to_write = new byte[this.taille];
+                image_to_write[0] = 66;
+                image_to_write[1] = 77;
 
 
                 //Console.WriteLine(image_to_write.Length);
@@ -165,7 +175,20 @@ namespace PSI_A2
 
         }
 
-        public int Convertir_Endian_To_Int(byte[] tab)
+
+        static void fractale()
+        {
+            double x_1 = -2.1;
+            double x_2 = 0.6;
+            double y_1 = -1.2;
+            double y_2 = 1.2;
+
+
+
+        }
+
+
+        private int Convertir_Endian_To_Int(byte[] tab)
         {
 
             int s = 0;
@@ -176,7 +199,7 @@ namespace PSI_A2
             return s;
         }
 
-        public byte[] Convertir_Int_To_Endian(long entier)
+        private byte[] Convertir_Int_To_Endian(long entier)
         {
             int p = 0;
             while ((entier / Convert.ToInt64(Math.Pow(256, p)) >= 1))
@@ -355,7 +378,7 @@ namespace PSI_A2
             }
             new_height = y_max - y_min + 1;
             new_width = x_max - x_min + 1;
-            
+
             Pixel[,] new_matrix = new Pixel[new_height, new_width];
             int[] new_center = { new_matrix.GetLength(0) / 2, new_matrix.GetLength(1) / 2 };
             for (int i = 0; i < new_matrix.GetLength(0); i++)
@@ -410,9 +433,10 @@ namespace PSI_A2
 
         public void Blur()
         {
+            //double[,] mat_blur = { { 1.0/9.0, 1.0/9.0, 1.0/9.0 }, { 1.0/9.0, 1.0/9.0, 1.0/9.0 }, { 1.0/9.0, 1.0/9.0, 1.0/9.0 } };
             int[,] mat_blur = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
             //int[,] mat_blur = { { 1, 4, 6, 4, 1 }, { 4, 16, 24, 16, 4 }, { 6, 24, 36, 24, 6 }, { 4, 16, 24, 16, 4 } };
-            this.pixel_image = Convolution(mat_blur);
+            this.pixel_image = Convolution(mat_blur, 1.0 / 9.0);
 
 
         }
@@ -420,7 +444,28 @@ namespace PSI_A2
         public void Edges_detection()
         {
             int[,] mat = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+            //Sobel detection
+            //int[,] mat = { { -1, 0, 1 }, { -1, 0, 1 }, { -1, 0, 1 } };
+            //int[,] mat = { { 1, 1, 1 }, { 0, 0, 0 }, { -1, -1, -1 } };
             this.pixel_image = Convolution(mat);
+            for (int i = 0; i < this.pixel_image.GetLength(0); i++)
+            {
+                for (int j = 0; j < this.pixel_image.GetLength(1); j++)
+                {
+                    if (this.pixel_image[i, j].R > 0 || this.pixel_image[i, j].G > 0 || this.pixel_image[i, j].B > 0)
+                    {
+                        this.pixel_image[i, j].R = 255;
+                        this.pixel_image[i, j].G = 255;
+                        this.pixel_image[i, j].B = 255;
+                    }
+                    else
+                    {
+                        this.pixel_image[i, j].R = 0;
+                        this.pixel_image[i, j].G = 0;
+                        this.pixel_image[i, j].B = 0;
+                    }
+                }
+            }
         }
 
         public void Repoussage()
@@ -447,32 +492,37 @@ namespace PSI_A2
             return retour;
         }
 
-        
-        public Pixel[,] Convolution(int[,] mat_conv)
-        {
-             
-            Pixel[,] new_matrix = this.pixel_image;
-            int somme_matrix_convo = 0;
-            int decalage = 0;
-            for (int i = 0; i < mat_conv.GetLength(0); i++)
-            {
-                for (int j = 0; j < mat_conv.GetLength(1); j++)
-                {
-                    somme_matrix_convo += mat_conv[i, j];
 
+        public Pixel[,] Convolution(int[,] mat_conv, double coeff = 1)
+        {
+
+            Pixel[,] new_matrix = this.pixel_image;
+
+            for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - (mat_conv.GetLength(0) / 2); i++)
+            {
+                for (int j = mat_conv.GetLength(1) / 2; j < new_matrix.GetLength(1) - (mat_conv.GetLength(1) / 2); j++)
+                {
+                    int ope_red = 0;
+                    int ope_green = 0;
+                    int ope_blue = 0;
+
+                    for (int k = 0; k < mat_conv.GetLength(0); k++)
+                    {
+                        for (int l = 0; l < mat_conv.GetLength(1); l++)
+                        {
+                            ope_red += this.pixel_image[i + k - (mat_conv.GetLength(0) / 2), j + l - (mat_conv.GetLength(1) / 2)].R * mat_conv[k, l];
+                            ope_green += this.pixel_image[i + k - (mat_conv.GetLength(0) / 2), j + l - (mat_conv.GetLength(1) / 2)].G * mat_conv[k, l];
+                            ope_blue += this.pixel_image[i + k - (mat_conv.GetLength(0) / 2), j + l - (mat_conv.GetLength(1) / 2)].B * mat_conv[k, l];
+                        }
+                    }
+                    new_matrix[i, j] = new Pixel((byte)(coeff * ope_red), (byte)(coeff * ope_green), (byte)(coeff * ope_blue));
                 }
             }
 
-            if (somme_matrix_convo == 0)
-            {
-                somme_matrix_convo = 1;
-                decalage = 15;
-            }
-            decalage = (somme_matrix_convo < 0) ? 255 : decalage;
-            somme_matrix_convo = 9;
 
 
-            for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - mat_conv.GetLength(0) / 2; i++)
+
+            /*for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - mat_conv.GetLength(0) / 2; i++)
             {
                 for (int j = mat_conv.GetLength(1) / 2; j < new_matrix.GetLength(1) - mat_conv.GetLength(1) / 2; j++)
                 {
@@ -494,9 +544,9 @@ namespace PSI_A2
                         }
                     }
                     
-                    new_matrix[i, j] = new Pixel((byte)((ope_red/somme_matrix_convo) + decalage), (byte)((ope_blue/somme_matrix_convo) +decalage), (byte)((ope_green/somme_matrix_convo) + decalage));
+                    new_matrix[i, j] = new Pixel((byte)(ope_red), (byte)(ope_blue), (byte)(ope_green));
                 }
-            }
+            }*/
             return new_matrix;
         }
 
@@ -506,18 +556,18 @@ namespace PSI_A2
 
             if (!only_header)
             {
-                Console.WriteLine("\n HEADER \n");
+                /*Console.WriteLine("\n HEADER \n");
                 for (int i = 0; i < 14; i++)
                 {
-                    Console.Write(header[i] + " ");
+                    Console.Write(this.header[i] + " ");
                 }
                 Console.WriteLine("\n HEADER INFO \n");
 
                 for (int i = 14; i < 54; i++)
                 {
-                    Console.Write(header[i] + " ");
+                    Console.Write(this.header[i] + " ");
 
-                }
+                }*/
 
 
 
@@ -539,24 +589,148 @@ namespace PSI_A2
                 Console.WriteLine("\n HEADER \n");
                 for (int i = 0; i < 14; i++)
                 {
-                    Console.Write(header[i] + " ");
+                    Console.Write(this.header[i] + " ");
                 }
                 Console.WriteLine("\n HEADER INFO \n");
 
                 for (int i = 14; i < 54; i++)
                 {
-                    Console.Write(header[i] + " ");
+                    Console.Write(this.header[i] + " ");
 
                 }
 
             }
-
-
-
-
-
-
-
         }
+        public void Histogramme()
+        {
+
+
+            Pixel rouge = new Pixel(255, 0, 0);
+            Pixel vert = new Pixel(0, 255, 0);
+            Pixel bleu = new Pixel(0, 0, 255);
+            Pixel gris = new Pixel(172, 172, 172);
+
+            int[] tab_red = new int[256];
+            int[] tab_green = new int[256];
+            int[] tab_blue = new int[256];
+            int[] tab_grey = new int[256];
+
+            for (int i = 0; i < tab_red.Length; i++)
+            {
+                tab_red[i] = pixel_count(pixel_image, (byte)(i), "r") / 10;
+            }
+            for (int i = 0; i < tab_green.Length; i++)
+            {
+                tab_green[i] = pixel_count(pixel_image, (byte)(i), "g") / 10;
+            }
+            for (int i = 0; i < tab_blue.Length; i++)
+            {
+                tab_blue[i] = pixel_count(pixel_image, (byte)(i), "b") / 10;
+            }
+            for (int i = 0; i < tab_grey.Length; i++)
+            {
+                tab_grey[i] = pixel_count(pixel_image, (byte)(i), "grey") / 10;
+            }
+
+
+
+            int max = 0;
+
+            max = (Maximum(tab_red) > Maximum(tab_green)) ? Maximum(tab_red) : Maximum(tab_green);
+            max = (max > Maximum(tab_blue)) ? max : Maximum(tab_blue);
+            max = (max > Maximum(tab_grey)) ? max : Maximum(tab_grey);
+
+            Pixel[,] histo = new Pixel[max, 4 * 256 + 30];
+
+            for (int j = 0; j < 256; j++)
+            {
+                for (int n = 0; n < tab_red[j]; n++)
+                {
+                    histo[n, j] = rouge;
+                }
+            }
+            for (int j = 256 + 10; j < 256 + 10 + 256; j++)
+            {
+                for (int n = 0; n < tab_green[j - 256 - 10]; n++)
+                {
+                    histo[n, j] = vert;
+                }
+            }
+            for (int j = 256 + 10 + 256 + 10; j < 256 + 10 + 256 + 10 + 256; j++)
+            {
+                for (int n = 0; n < tab_blue[j - 256 - 10 - 256 - 10]; n++)
+                {
+                    histo[n, j] = bleu;
+                }
+            }
+
+            for (int j = 256 + 10 + 256 + 10 + 256 + 10; j < 256 + 10 + 256 + 10 + 256 + 10 + 256; j++)
+            {
+                for (int n = 0; n < tab_grey[j - 256 - 10 - 256 - 10 - 256 - 10]; n++)
+                {
+                    histo[n, j] = gris;
+                }
+            }
+
+
+            this.pixel_image = histo;
+        }
+        public int pixel_count(Pixel[,] image, byte temp, string c)
+        {
+            c.ToLower();
+            int retour = 0;
+            for (int i = 0; i < image.GetLength(0); i++)
+            {
+                for (int j = 0; j < image.GetLength(1); j++)
+                {
+                    if (c == "r")
+                    {
+                        if (image[i, j].R == temp)
+                        {
+                            retour++;
+                        }
+                    }
+                    else if (c == "g")
+                    {
+                        if (image[i, j].G == temp)
+                        {
+                            retour++;
+                        }
+                    }
+                    else if (c == "b")
+                    {
+                        if (image[i, j].B == temp)
+                        {
+                            retour++;
+                        }
+                    }
+                    else if (c == "grey")
+                    {
+                        if ((image[i, j].B + image[i, j].G + image[i, j].R) / 3 == temp)
+                        {
+                            retour++;
+                        }
+                    }
+                }
+
+            }
+            return retour;
+        }
+        public int Maximum(int[] tab)
+        {
+            int retour = 0;
+            for (int i = 0; i < tab.Length; i++)
+            {
+                if (tab[i] > retour)
+                {
+                    retour = tab[i];
+                }
+            }
+            return retour;
+        }
+
+        
+
+
     }
 }
