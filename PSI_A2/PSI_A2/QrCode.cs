@@ -82,10 +82,20 @@ namespace PSI_A2
                     
                 }
             }
-            //Les trois pixels de coin 
+            //Les trois pixels de coin des liserés
             qr[7, 7] = new Pixel("w");
             qr[qr.GetLength(0) - 1 - 7, 7] = new Pixel("w");
             qr[7, qr.GetLength(1) - 1 - 7] = new Pixel("w");
+
+            //Motifs de synchronisation
+            for(int j = 9; j < qr.GetLength(1) - 7-1; j+=2)
+            {
+                qr[7, j] = new Pixel("w");
+            }
+            for (int i = 9; i < qr.GetLength(0) - 7 - 1; i += 2)
+            {
+                qr[i, 7] = new Pixel("w");
+            }
 
         }
 
@@ -122,7 +132,8 @@ namespace PSI_A2
             else if (this.my_string.Length < 48)
             {
                 Pixel[,] pixel_qr = new Pixel[25, 25];
-                //this.qr = new MyImage("BM",)
+                Mutual_Part(pixel_qr);
+                this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
 
 
             }
