@@ -26,6 +26,8 @@ namespace PSI_A2
                 byte[] tab_temp = { 0, 18, 11, 0 };
                 header[10+i] = MyImage.Convertir_Int_To_Endian(54)[i];
                 header[14 + i] = MyImage.Convertir_Int_To_Endian(40)[i];
+                header[38 + i] = MyImage.Convertir_Int_To_Endian(1000)[i];
+                header[42 + i] = MyImage.Convertir_Int_To_Endian(1000)[i];
                 //header[38 + i] = tab_temp[i];
                 //header[42 + i] = tab_temp[i];
 
@@ -43,6 +45,7 @@ namespace PSI_A2
 
         public void Qr_Save()
         {
+            
             this.qr.FromImageToFile(this.writing_path);
         }
 
@@ -52,21 +55,37 @@ namespace PSI_A2
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    if (((i == 1 || i == 5) && j > 0 && j < 6) || ((j == 1 || j == 5) && i > 1 && i < 4))
+                    if (((i == 1 || i == 5) && j > 0 && j < 6) || ((j == 1 || j == 5) && i > 1 && i < 5))
                     {
                         qr[i, j] = new Pixel("w");
-                        qr[i, j + qr.GetLength(1) - 7] = new Pixel("w");
+                        qr[i , j + qr.GetLength(1) - 7] = new Pixel("w");
                         qr[i + qr.GetLength(0) - 7, j] = new Pixel("w");
 
                     }
                     else
                     {
                         qr[i, j] = new Pixel("b");
-                        qr[i, j + qr.GetLength(1) - 7] = new Pixel("b");
+                        qr[i , j + qr.GetLength(1) - 7] = new Pixel("b");
                         qr[i + qr.GetLength(0) - 7, j] = new Pixel("b");
                     }
+                    //Je fais les liseré blanc autour des séparateurs
+
+                    qr[i, 7] = new Pixel("w");
+                    qr[i, qr.GetLength(1)-1-7] = new Pixel("w");
+
+                    qr[7, qr.GetLength(1) - 1 - j] = new Pixel("w");
+                    qr[7, j] = new Pixel("w");
+
+                    qr[qr.GetLength(0)-1-i, 7] = new Pixel("w");
+                    qr[qr.GetLength(0)-1-7, j] = new Pixel("w");
+
+                    
                 }
             }
+            //Les trois pixels de coin 
+            qr[7, 7] = new Pixel("w");
+            qr[qr.GetLength(0) - 1 - 7, 7] = new Pixel("w");
+            qr[7, qr.GetLength(1) - 1 - 7] = new Pixel("w");
 
         }
 
@@ -113,22 +132,41 @@ namespace PSI_A2
 
         }
 
-        public void Affiche()
+        public void Affiche(bool only_header)
         {
-            byte[] header = Header_Generator();
-
-            for(int i = 0; i < 14; i++)
+            if (only_header)
             {
-                Console.Write(header[i]+ " ");
-            }
-            Console.WriteLine();
+                byte[] header = Header_Generator();
 
-            for(int i = 14; i < header.Length; i++)
+                for (int i = 0; i < 14; i++)
+                {
+                    Console.Write(header[i] + " ");
+                }
+                Console.WriteLine();
+
+                for (int i = 14; i < header.Length; i++)
+                {
+                    Console.Write(header[i] + " ");
+                }
+            }
+            else
             {
-                Console.Write(header[i] + " ");
+                for (int i = 0; i < this.qr.Pixel_image.GetLength(0); i++)
+                {
+                    for (int j = 0; j < this.qr.Pixel_image.GetLength(1); j++)
+                    {
+                        if (this.qr.Pixel_image[i, j].R == 255 && this.qr.Pixel_image[i, j].G == 255 && this.qr.Pixel_image[i, j].B == 255)
+                        {
+                            Console.Write(1 + " ");
+                        }
+                        else Console.Write(0 + " ");
+                    }
+                    Console.WriteLine();
+                }
             }
-
         }
+
+        
 
         private string BinaryConverterFromInt(int num, int taille = -1)
         {

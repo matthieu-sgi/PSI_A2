@@ -196,17 +196,21 @@ namespace PSI_A2
             //image.Affiche(true);
             //image.Miror(false);
             //image.Miror(false);
-            //image.Affiche(true);
+            /*image.Affiche(true);
+            Console.WriteLine();*/
             //Console.WriteLine(traie.Height_Pixel);
             //image.Nuance_de_Gris();
             //image.Resize(500, 500);
             //image.Repoussage();
             //image.Edges_detection();
             //image.Blur();
+            /*byte[] tab = { 54, 0, 12, 0 };
+            Console.WriteLine(image.Convertir_Endian_To_Int(tab));*/
 
             //image.FromImageToFile(writing_path);
-            qr.Affiche();
-            //qr.Qr_Save();
+            qr.Affiche(false);
+            
+            qr.Qr_Save();
 
 
 

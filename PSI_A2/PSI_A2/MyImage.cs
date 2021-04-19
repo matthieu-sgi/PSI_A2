@@ -125,9 +125,8 @@ namespace PSI_A2
                 this.taille = this.offset + width_to_save * pixel_image.GetLength(0);
                 
                 byte[] image_to_write = new byte[this.taille];
-                image_to_write[0] = 66;
-                image_to_write[1] = 77;
-
+                
+                Console.WriteLine("Calcul : "+(pixel_image.GetLength(1) * pixel_image.GetLength(0) * 24) / 8);
 
                 //Console.WriteLine(image_to_write.Length);
 
@@ -135,27 +134,43 @@ namespace PSI_A2
                 {
                     image_to_write[i] = this.header[i];
                 }
-
+                image_to_write[0] = 66;
+                image_to_write[1] = 77;
                 //Recalculating size, width and height
                 for (int i = 0; i < 4; i++)
                 {
-                    image_to_write[i + 2] = Convertir_Int_To_Endian(this.taille)[i];
+                    image_to_write[i + 2] = Convertir_Int_To_Endian(((pixel_image.GetLength(1)*pixel_image.GetLength(0)*24)/8)+this.offset)[i];
                     image_to_write[i + 18] = Convertir_Int_To_Endian(pixel_image.GetLength(1))[i];
                     image_to_write[i + 22] = Convertir_Int_To_Endian(pixel_image.GetLength(0))[i];
+                   
 
 
 
                 }
 
+                //Im testing to understand better
+
+               /* for(int i = 0; i < this.offset; i++)
+                {
+                    if (i < 14)
+                    {
+                        Console.Write(image_to_write[i] + " ");
+                    }
+                    else if (i == 14) Console.Write("\n" + image_to_write[i] + " ");
+                    else Console.Write(image_to_write[i] + " ");
+                    
+                }*/
 
 
 
+                
 
 
                 for (int i = 0; i < pixel_image.GetLength(0); i++)
                 {
                     for (int j = 0; j < width_to_save; j++)
                     {
+
                         if (j < pixel_image.GetLength(1))
                         {
                             image_to_write[this.offset + i * width_to_save + j * 3] = this.pixel_image[i, j].B;
@@ -163,14 +178,14 @@ namespace PSI_A2
                             image_to_write[this.offset + i * width_to_save + j * 3 + 2] = this.pixel_image[i, j].R;
                         }
 
-
+                        
                     }
 
                 }
 
 
                 File.WriteAllBytes(file, image_to_write);
-
+                
                 Console.WriteLine("Save and Done");
             }
 
@@ -189,7 +204,7 @@ namespace PSI_A2
         }
 
 
-        private int Convertir_Endian_To_Int(byte[] tab)
+        public int Convertir_Endian_To_Int(byte[] tab)
         {
 
             int s = 0;
