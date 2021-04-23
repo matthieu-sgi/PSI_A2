@@ -124,7 +124,7 @@ namespace PSI_A2
             if (this.my_string.Length < 26)
             {
                 Pixel[,] pixel_qr = new Pixel[21, 21];
-                MandatoryPart_V1(pixel_qr);
+                Mutual_Part(pixel_qr);
                 this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
                 
 
@@ -142,6 +142,65 @@ namespace PSI_A2
 
 
         }
+
+        public int[] String_To_Int(string arg)
+        {
+
+            arg = arg.ToUpper();
+            int[] array_retour = new int[arg.Length / 2 +arg.Length%2];
+            
+            for(int i= 0; i < arg.Length; i ++)
+            {
+                if(char.IsLetterOrDigit(arg[i]) )
+                {
+                    array_retour[i / 2] += (int)(Math.Pow(45, (i + 1) % 2)+1((i+1)==arg.Length)) * ((int)(arg[i] )-55);
+
+                }
+                else
+                {
+                    int value;
+                    switch (arg[i])
+                    {
+                        case ' ':
+                            value = 36;
+                            break;
+                        case '$':
+                            value = 37;
+                            break;
+                        case '%':
+                            value = 38;
+                            break;
+                        case '*':
+                            value = 39;
+                            break;
+                        case '+':
+                            value = 40;
+                            break;
+                        case '-':
+                            value = 41;
+                            break;
+                        case '.':
+                            value = 42;
+                            break;
+                        case '/':
+                            value = 43;
+                            break;
+                        case ':':
+                            value = 44;
+                            break;
+                        default:
+                            value = 0;
+                            break;
+
+                    }
+                    array_retour[i / 2] += (int)(Math.Pow(45, (i + 1) % 2)) * (value);
+                }
+                
+            }
+            Console.WriteLine(String.Join(" ",array_retour));
+            return array_retour;
+        }
+
 
         public void Affiche(bool only_header)
         {

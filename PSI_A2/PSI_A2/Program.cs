@@ -208,10 +208,17 @@ namespace PSI_A2
             Console.WriteLine(image.Convertir_Endian_To_Int(tab));*/
 
             //image.FromImageToFile(writing_path);
-            qr.Affiche(false);
-            
-            qr.Qr_Save();
-
+            //qr.Affiche(false);
+            qr.String_To_Int("hello wOrlD");
+            //qr.Qr_Save();
+            /*Console.WriteLine((int)(' '));
+            Console.WriteLine((int)('$'));
+            Console.WriteLine((int)('%'));
+            Console.WriteLine((int)('*'));
+            Console.WriteLine((int)('-'));
+            Console.WriteLine((int)('.'));
+            Console.WriteLine((int)('/'));
+            Console.WriteLine((int)(':'));*/
 
 
 
