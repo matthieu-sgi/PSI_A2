@@ -113,6 +113,7 @@ namespace PSI_A2
         public Pixel[,] Pixel_image
         {
             get { return this.pixel_image; }
+            set { this.pixel_image = value; }
         }
 
 
@@ -192,15 +193,51 @@ namespace PSI_A2
         }
 
 
-        static void fractale()
+        public void Fractale()
         {
-            double x_1 = -2.1;
-            double x_2 = 0.6;
-            double y_1 = -1.2;
-            double y_2 = 1.2;
+            int imagex = 3000;
+            int imagey = 3000;
+            int iteration_max = 50;
+            double c_r = 0;
+            double c_i = 0;
+            double z_r = 0;
+            double z_i = 0;
+            int i = 0;
+            double tmp = 0;
 
+            Pixel[,] fractale = new Pixel[imagex, imagey];
 
+            for (int x = 0; x < imagex; x++)
+            {
+                for (int y = 0; y < imagey; y++)
+                {
+                    c_r = (double)(x - (imagex) / 2) / (double)(imagex / 3);
+                    c_i = (double)(y - (imagey) / 2) / (double)(imagey / 3);
+                    z_r = 0;
+                    z_i = 0;
+                    i = 0;
 
+                    while (i < iteration_max && z_r * z_r + z_i * z_i < 4)
+                    {
+                        tmp = z_r;
+                        z_r = z_r * z_r - z_i * z_i + c_r;
+                        z_i = 2 * z_i * tmp + c_i;
+                        i = i + 1;
+                    }
+                    if (i == iteration_max)
+                    {
+
+                        fractale[x, y] = new Pixel(0, 0, 0);
+                    }
+                    else
+                    {
+                        fractale[x, y] = new Pixel((byte)(i * 255 / iteration_max), 0, (byte)(i * 255 / iteration_max));
+
+                    }
+
+                }
+            }
+            this.pixel_image = fractale;
         }
 
 

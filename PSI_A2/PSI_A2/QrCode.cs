@@ -45,7 +45,15 @@ namespace PSI_A2
 
         public void Qr_Save()
         {
-
+            Pixel[,] temp = new Pixel[qr.Pixel_image.GetLength(0), qr.Pixel_image.GetLength(1)];
+            for(int i = 0; i < temp.GetLength(0); i++)
+            {
+                for(int j = 0; j < temp.GetLength(1); j++)
+                {
+                    temp[i,j] = this.qr.Pixel_image[temp.GetLength(0) - 1 - i, j];
+                }
+            }
+            this.qr.Pixel_image = temp;
             this.qr.FromImageToFile(this.writing_path);
         }
 
@@ -68,7 +76,7 @@ namespace PSI_A2
                         qr[i, j + qr.GetLength(1) - 7] = new Pixel("b");
                         qr[i + qr.GetLength(0) - 7, j] = new Pixel("b");
                     }
-                    //Je fais les liseré blanc autour des séparateurs
+                    //Je fais les liserés blancs autour des séparateurs
 
                     qr[i, 7] = new Pixel("w");
                     qr[i, qr.GetLength(1) - 1 - 7] = new Pixel("w");
