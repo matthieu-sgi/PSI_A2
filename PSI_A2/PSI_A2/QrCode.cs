@@ -208,14 +208,17 @@ namespace PSI_A2
             string retour_string = "0010";
             string specific_octet_1 = "1110110000010001";
 
-            retour_string += BinaryConverterFromInt(this.my_string.Length, 8); //Longueur de la chaine de caractères
+            //retour_string += BinaryConverterFromInt(this.my_string.Length, 9); //Longueur de la chaine de caractères
+            retour_string += Convert.ToString(this.my_string.Length, 2).PadLeft(9, '0');
             int[] result_int = String_To_Int(this.my_string);
 
-            //Données encodées avec un test pour savoir s'il faut l'encoder sur 8 ou 6 bits
+            //Données encodées avec un test pour savoir s'il faut l'encoder sur 11 ou 6 bits
             for (int i = 0; i < result_int.Length; i++)
             {   
-                retour_string += (this.my_string.Length % 2 == 1 && i == result_int.Length - 1) ? BinaryConverterFromInt(result_int[i], 6) : BinaryConverterFromInt(result_int[i], 8);
+                retour_string += (this.my_string.Length % 2 == 1 && i == result_int.Length - 1) ?
+                    Convert.ToString(result_int[i], 2).PadLeft(6, '0') : Convert.ToString(result_int[i], 2).PadLeft(11, '0');
             }
+            
             //Terminaison
             for (int i = 0; i < 4 && retour_string.Length < total_octet * 8; i++)
             {
@@ -228,6 +231,7 @@ namespace PSI_A2
                 retour_string += 0;
             }
             string temp = "";
+            Console.WriteLine(retour_string.Length);
             //Ajoute les octets spécifiques 
             for (int i = 0; i < (((total_octet * 8 - retour_string.Length) / 8) - 7) * 8;  i++)
             {
@@ -236,9 +240,14 @@ namespace PSI_A2
             }
             retour_string += temp;
 
-
+            byte[] buff = String_To_ByteArray(retour_string);
+            byte[] ecc = ReedSolomonAlgorithm.Encode(buff, ec_octet, ErrorCorrectionCodeType.QRCode);
+            for(int i = 0; i < ecc.Length; i++)
+            {
+                my_string += Convert.ToString(ecc[i],2);
+            }
             //Console.WriteLine(retour_string+"\n"+retour_string.Length);
-
+            Console.WriteLine(string.Join(" ",ecc));
             return retour_string;
         }
 
@@ -277,17 +286,8 @@ namespace PSI_A2
         }
 
 
-        private string Right_Length(string bits, int len)
-        {
-            string retour = "";
-            for (int i = 0; i < len - bits.Length; i++)
-            {
-                retour += 0;
-            }
-            return retour + bits;
-        }
 
-        private string BinaryConverterFromInt(int num, int taille = -1)
+        /*private string BinaryConverterFromInt(int num, int taille = -1)
         {
             string binary = "";
             int p = 0;
@@ -311,6 +311,26 @@ namespace PSI_A2
 
             }
             return binary;
+        }*/
+
+        private byte[] String_To_ByteArray(string my_string)
+        {
+            byte[] retour = new byte[my_string.Length/8];
+            for(int i = 0; i < my_string.Length; i+=8)
+            {
+                byte temp = 0;
+                for (int j = 0; j < 8; j++)
+                {
+                    temp = (byte)(temp << 1);
+                    temp = (byte)(temp |((int)(my_string[i + j]) - 48));
+                    
+                }
+                retour[i / 8] = temp;
+            }
+
+            return retour;
+
+
         }
     }
 }

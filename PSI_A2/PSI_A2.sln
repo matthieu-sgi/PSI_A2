@@ -5,6 +5,15 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PSI_A2", "PSI_A2\PSI_A2.csproj", "{972573AE-50A8-4A93-A5B3-F74B0D41D0BF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4737D01A-2D7A-4C02-A0E0-90622B991C23}"
+	ProjectSection(SolutionItems) = preProject
+		C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\GenericGF.cs = C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\GenericGF.cs
+		C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\GenericGFPoly.cs = C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\GenericGFPoly.cs
+		C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\ReedSolomonAlgorithm.cs = C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\ReedSolomonAlgorithm.cs
+		C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\ReedSolomonDecoder.cs = C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\ReedSolomonDecoder.cs
+		C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\ReedSolomonEncoder.cs = C:\Users\matth\Desktop\UtilisationReedSolomon\ConsoleApp2\ReedSolomonEncoder.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
