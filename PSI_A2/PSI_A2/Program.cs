@@ -36,7 +36,7 @@ namespace PSI_A2
             }
             else path += nom_image;*/
             MyImage image = new MyImage(path);
-            QrCode qr = new QrCode("none", writing_path);
+            QrCode qr = new QrCode("Hello world", writing_path);
 
             #region Menu sympathique
 
@@ -209,7 +209,7 @@ namespace PSI_A2
 
             //image.FromImageToFile(writing_path);
             //qr.Affiche(false);
-            qr.String_To_Int("hello wOrlD");
+            //qr.String_To_Int("hello wOrlD");
             //qr.Qr_Save();
             /*Console.WriteLine((int)(' '));
             Console.WriteLine((int)('$'));
@@ -219,7 +219,7 @@ namespace PSI_A2
             Console.WriteLine((int)('.'));
             Console.WriteLine((int)('/'));
             Console.WriteLine((int)(':'));*/
-
+            qr.String_To_Save(19);
 
 
             Console.ReadKey();

@@ -24,7 +24,7 @@ namespace PSI_A2
             for (int i = 0; i < 4; i++)
             {
                 byte[] tab_temp = { 0, 18, 11, 0 };
-                header[10+i] = MyImage.Convertir_Int_To_Endian(54)[i];
+                header[10 + i] = MyImage.Convertir_Int_To_Endian(54)[i];
                 header[14 + i] = MyImage.Convertir_Int_To_Endian(40)[i];
                 header[38 + i] = MyImage.Convertir_Int_To_Endian(1000)[i];
                 header[42 + i] = MyImage.Convertir_Int_To_Endian(1000)[i];
@@ -32,8 +32,8 @@ namespace PSI_A2
                 //header[42 + i] = tab_temp[i];
 
             }
-            
-            for(int i = 0; i < 2; i++)
+
+            for (int i = 0; i < 2; i++)
             {
                 header[26 + i] = MyImage.Convertir_Int_To_Endian(1)[i];
                 header[28 + i] = MyImage.Convertir_Int_To_Endian(24)[i];
@@ -45,7 +45,7 @@ namespace PSI_A2
 
         public void Qr_Save()
         {
-            
+
             this.qr.FromImageToFile(this.writing_path);
         }
 
@@ -58,28 +58,28 @@ namespace PSI_A2
                     if (((i == 1 || i == 5) && j > 0 && j < 6) || ((j == 1 || j == 5) && i > 1 && i < 5))
                     {
                         qr[i, j] = new Pixel("w");
-                        qr[i , j + qr.GetLength(1) - 7] = new Pixel("w");
+                        qr[i, j + qr.GetLength(1) - 7] = new Pixel("w");
                         qr[i + qr.GetLength(0) - 7, j] = new Pixel("w");
 
                     }
                     else
                     {
                         qr[i, j] = new Pixel("b");
-                        qr[i , j + qr.GetLength(1) - 7] = new Pixel("b");
+                        qr[i, j + qr.GetLength(1) - 7] = new Pixel("b");
                         qr[i + qr.GetLength(0) - 7, j] = new Pixel("b");
                     }
                     //Je fais les liseré blanc autour des séparateurs
 
                     qr[i, 7] = new Pixel("w");
-                    qr[i, qr.GetLength(1)-1-7] = new Pixel("w");
+                    qr[i, qr.GetLength(1) - 1 - 7] = new Pixel("w");
 
                     qr[7, qr.GetLength(1) - 1 - j] = new Pixel("w");
                     qr[7, j] = new Pixel("w");
 
-                    qr[qr.GetLength(0)-1-i, 7] = new Pixel("w");
-                    qr[qr.GetLength(0)-1-7, j] = new Pixel("w");
+                    qr[qr.GetLength(0) - 1 - i, 7] = new Pixel("w");
+                    qr[qr.GetLength(0) - 1 - 7, j] = new Pixel("w");
 
-                    
+
                 }
             }
             //Les trois pixels de coin des liserés
@@ -88,7 +88,7 @@ namespace PSI_A2
             qr[7, qr.GetLength(1) - 1 - 7] = new Pixel("w");
 
             //Motifs de synchronisation
-            for(int j = 9; j < qr.GetLength(1) - 7-1; j+=2)
+            for (int j = 9; j < qr.GetLength(1) - 7 - 1; j += 2)
             {
                 qr[7, j] = new Pixel("w");
             }
@@ -126,7 +126,7 @@ namespace PSI_A2
                 Pixel[,] pixel_qr = new Pixel[21, 21];
                 Mutual_Part(pixel_qr);
                 this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
-                
+
 
             }
             else if (this.my_string.Length < 48)
@@ -147,14 +147,14 @@ namespace PSI_A2
         {
 
             arg = arg.ToUpper();
-            int[] array_retour = new int[arg.Length / 2 +arg.Length%2];
-            
-            for(int i= 0; i < arg.Length; i ++)
+            int[] array_retour = new int[arg.Length / 2 + arg.Length % 2];
+
+            for (int i = 0; i < arg.Length; i++)
             {
-                if(char.IsLetterOrDigit(arg[i]) )
+                if (char.IsLetterOrDigit(arg[i]))
                 {
 
-                    array_retour[i / 2] += (arg.Length%2 == 1 && i == arg.Length-1)? (int)(Math.Pow(45, 0) * ((int)(arg[i]) - 55)) : (int)(Math.Pow(45, (i + 1) % 2) * ((int)(arg[i] )-55));
+                    array_retour[i / 2] += (arg.Length % 2 == 1 && i == arg.Length - 1) ? (int)(Math.Pow(45, 0) * ((int)(arg[i]) - 55)) : (int)(Math.Pow(45, (i + 1) % 2) * ((int)(arg[i]) - 55));
 
                 }
                 else
@@ -194,14 +194,39 @@ namespace PSI_A2
                             break;
 
                     }
-                    array_retour[i / 2] += (int)(Math.Pow(45, (i + 1) % 2)) * (value);
+                    array_retour[i / 2] += (arg.Length % 2 == 1 && i == arg.Length - 1) ? (int)(Math.Pow(45, 0)) * (value) : (int)(Math.Pow(45, (i + 1) % 2)) * (value);
                 }
-                
+
             }
-            Console.WriteLine(String.Join(" ",array_retour));
+            Console.WriteLine(String.Join(" ", array_retour));
             return array_retour;
         }
 
+
+        public string String_To_Save(int total_octet)
+        {
+            string retour_string = "0010";
+
+            retour_string += BinaryConverterFromInt(this.my_string.Length, 8);
+            int[] result_int = String_To_Int(this.my_string);
+            for (int i = 0; i < result_int.Length; i++)
+            {
+                retour_string += (this.my_string.Length % 2 == 1 && i == result_int.Length - 1) ? BinaryConverterFromInt(result_int[i], 6) : BinaryConverterFromInt(result_int[i], 8);
+            }
+
+            for (int i = 0; i < 4 && retour_string.Length < total_octet * 8; i++)
+            {
+                retour_string += 0;
+            }
+            for(int i = 0; i < retour_string.Length % 8; i++)
+            {
+                retour_string += 0;
+            }
+
+            Console.WriteLine(retour_string+"\n"+retour_string.Length);
+
+            return retour_string;
+        }
 
         public void Affiche(bool only_header)
         {
@@ -237,7 +262,16 @@ namespace PSI_A2
             }
         }
 
-        
+
+        private string Right_Length(string bits, int len)
+        {
+            string retour = "";
+            for (int i = 0; i < len - bits.Length; i++)
+            {
+                retour += 0;
+            }
+            return retour + bits;
+        }
 
         private string BinaryConverterFromInt(int num, int taille = -1)
         {

@@ -744,9 +744,100 @@ namespace PSI_A2
             }
             return retour;
         }
+        public void HiddenPic(Pixel[,] image2)
+        {
+            Pixel[,] image_retour = new Pixel[this.pixel_image.GetLength(0), this.pixel_image.GetLength(1)];
+            for (int i = 0; i < image_retour.GetLength(0); i++)
+            {
+                for (int n = 0; n < image_retour.GetLength(1); n++)
+                {
+                    image_retour[i, n].B = (byte)Convertir_Binairy_To_Int(Concaténer_tableaux(Convertir_Int_To_Binairy((int)this.pixel_image[i, n].B), Convertir_Int_To_Binairy((int)image2[i, n].B)));
+                    image_retour[i, n].G = (byte)Convertir_Binairy_To_Int(Concaténer_tableaux(Convertir_Int_To_Binairy((int)this.pixel_image[i, n].G), Convertir_Int_To_Binairy((int)image2[i, n].G)));
+                    image_retour[i, n].R = (byte)Convertir_Binairy_To_Int(Concaténer_tableaux(Convertir_Int_To_Binairy((int)this.pixel_image[i, n].R), Convertir_Int_To_Binairy((int)image2[i, n].R)));
+                }
+            }
+            this.pixel_image = image_retour;
+        }
+        public void Retrouver_image()
+        {
+            Pixel[,] image_retour = new Pixel[this.pixel_image.GetLength(0), this.pixel_image.GetLength(1)];
+            for (int i = 0; i < image_retour.GetLength(0); i++)
+            {
+                for (int n = 0; n < image_retour.GetLength(1); n++)
+                {
+                    image_retour[i, n].B = (byte)Convertir_Binairy_To_Int(Recuperer_tableau(Convertir_Int_To_Binairy((int)this.pixel_image[i, n].B)));
+                    image_retour[i, n].G = (byte)Convertir_Binairy_To_Int(Recuperer_tableau(Convertir_Int_To_Binairy((int)this.pixel_image[i, n].G)));
+                    image_retour[i, n].R = (byte)Convertir_Binairy_To_Int(Recuperer_tableau(Convertir_Int_To_Binairy((int)this.pixel_image[i, n].R)));
+                }
+            }
+            this.pixel_image = image_retour;
+        }
+        public int Convertir_Binairy_To_Int(int[] tab)
+        {
+            int s = 0;
+            for (int n = tab.Length - 1; n >= 0; n--)
+            {
+                s += tab[tab.Length - 1 - n] * Convert.ToInt32(Math.Pow(2, n));
+            }
+            return s;
+        }
 
-        
-
-
+        public int[] Convertir_Int_To_Binairy(int entier)
+        {
+            int p = 0;
+            while ((entier / Convert.ToInt64(Math.Pow(2, p)) >= 1))
+            {
+                p++;
+            }
+            p--;
+            int[] retour = new int[8];
+            int[] temp = new int[8];
+            for (int i = 0; i < retour.Length; i++)
+            {
+                temp[i] = 0;
+            }
+            for (int i = p; i >= 0; i--)
+            {
+                temp[i] = Convert.ToByte(entier / Convert.ToInt64(Math.Pow(2, p)));
+                entier -= temp[i] * Convert.ToInt32(Math.Pow(2, p));
+                p--;
+            }
+            for (int i = 0; i < retour.Length; i++)
+            {
+                retour[i] = temp[retour.Length - i - 1];
+            }
+            return retour;
+        }
+        public int[] Concaténer_tableaux(int[] tab1, int[] tab2)
+        {
+            int[] retour = new int[8];
+            for (int i = 0; i < 4; i++)
+            {
+                retour[i] = tab1[i];
+            }
+            for (int i = 4; i < 8; i++)
+            {
+                retour[i] = tab2[i - 4];
+            }
+            return retour;
+        }
+        public int[] Recuperer_tableau(int[] tab)
+        {
+            int[] retour = new int[8];
+            for (int i = 0; i < retour.Length; i++)
+            {
+                retour[i] = 0;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                retour[i] = tab[4 + i];
+            }
+            return retour;
+        }
     }
+
+
+
+
 }
+
