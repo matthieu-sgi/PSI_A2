@@ -153,7 +153,8 @@ namespace PSI_A2
             {
                 if(char.IsLetterOrDigit(arg[i]) )
                 {
-                    array_retour[i / 2] += (int)(Math.Pow(45, (i + 1) % 2)+1((i+1)==arg.Length)) * ((int)(arg[i] )-55);
+
+                    array_retour[i / 2] += (arg.Length%2 == 1 && i == arg.Length-1)? (int)(Math.Pow(45, 0) * ((int)(arg[i]) - 55)) : (int)(Math.Pow(45, (i + 1) % 2) * ((int)(arg[i] )-55));
 
                 }
                 else
