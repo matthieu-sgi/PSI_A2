@@ -203,27 +203,41 @@ namespace PSI_A2
         }
 
 
-        public string String_To_Save(int total_octet)
+        public string String_To_Save(int total_octet,int ec_octet)
         {
             string retour_string = "0010";
+            string specific_octet_1 = "1110110000010001";
 
-            retour_string += BinaryConverterFromInt(this.my_string.Length, 8);
+            retour_string += BinaryConverterFromInt(this.my_string.Length, 8); //Longueur de la chaine de caractères
             int[] result_int = String_To_Int(this.my_string);
+
+            //Données encodées avec un test pour savoir s'il faut l'encoder sur 8 ou 6 bits
             for (int i = 0; i < result_int.Length; i++)
-            {
+            {   
                 retour_string += (this.my_string.Length % 2 == 1 && i == result_int.Length - 1) ? BinaryConverterFromInt(result_int[i], 6) : BinaryConverterFromInt(result_int[i], 8);
             }
-
+            //Terminaison
             for (int i = 0; i < 4 && retour_string.Length < total_octet * 8; i++)
             {
                 retour_string += 0;
             }
+
+            //Complément pour faire un multiple de 8
             for(int i = 0; i < retour_string.Length % 8; i++)
             {
                 retour_string += 0;
             }
+            string temp = "";
+            //Ajoute les octets spécifiques 
+            for (int i = 0; i < (((total_octet * 8 - retour_string.Length) / 8) - 7) * 8;  i++)
+            {
+                temp += specific_octet_1[(i) % 16];
+                
+            }
+            retour_string += temp;
 
-            Console.WriteLine(retour_string+"\n"+retour_string.Length);
+
+            //Console.WriteLine(retour_string+"\n"+retour_string.Length);
 
             return retour_string;
         }

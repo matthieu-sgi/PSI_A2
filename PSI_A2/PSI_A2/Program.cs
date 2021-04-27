@@ -219,8 +219,8 @@ namespace PSI_A2
             Console.WriteLine((int)('.'));
             Console.WriteLine((int)('/'));
             Console.WriteLine((int)(':'));*/
-            qr.String_To_Save(19);
-
+            qr.String_To_Save(19,7  );
+            
 
             Console.ReadKey();
         }
