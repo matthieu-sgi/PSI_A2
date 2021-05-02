@@ -113,14 +113,17 @@ namespace PSI_A2
         {
 
             bool monte = true;
-            
+
             int counter = 0;
             string mask = "111011111000100";
             Console.WriteLine(bits.Length);
-            for (int i = this.qr.Pixel_image.GetLength(0) - 1; i >= 0; i--)
+
+
+            for (int j = this.qr.Pixel_image.GetLength(1) - 1; j > 0; j -= 2)
             {
-                
-                for (int j = this.qr.Pixel_image.GetLength(1) - 1; j > 0; j -= 2)
+
+                //for (int i = monte ? 0 : this.qr.Pixel_image.GetLength(0) - 1; monte ? i < this.qr.Pixel_image.GetLength(0) : i >= 0; i--)
+                for(int i= this.qr.Pixel_image.GetLength(0) - 1; i >= 0;i--)
                 {
                     //if((i>7 && j>7) || (i>7 && this.qr.Pixel_image.GetLength(1) -8>j ) 
                     //||(i< this.qr.Pixel_image.GetLength(0)-8 && j>8) && i!= 6 && j != 6)
@@ -129,61 +132,77 @@ namespace PSI_A2
 
                     else
                     {
-                        if (version_2 && (i < this.qr.Pixel_image.GetLength(0) - 9 || j < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
-                             || j > this.qr.Pixel_image.GetLength(1) - 5))
+                        if (version_2)
                         {
-                            Console.Write(counter + " ");
-                            if ( (i+j)%2 == 0 ^bits[counter] == '0' )
+                            if ((i < this.qr.Pixel_image.GetLength(0) - 9 || j < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
+                             || j > this.qr.Pixel_image.GetLength(1) - 5))
                             {
 
-                                this.qr.Pixel_image[i, j] = new Pixel("w");
-                            }
-                            else this.qr.Pixel_image[i, j] = new Pixel("b");
-                            counter++;
+                                Console.Write(counter + " ");
+                                if ((i + j) % 2 == 0 ^ bits[counter] == '0')
+                                {
 
+                                    this.qr.Pixel_image[i, j] = new Pixel("w");
+                                }
+                                else this.qr.Pixel_image[i, j] = new Pixel("b");
+                                counter++;
+
+                            }
                         }
                         else if (!version_2)
                         {
-                            if ((i + j) % 2 == 0 ^ bits[counter] == '0')
+                            if (counter < bits.Length)
                             {
+                                if ((i + j) % 2 == 0 ^ bits[counter] == '0')
+                                {
 
-                                this.qr.Pixel_image[i, j] = new Pixel("w");
+                                    this.qr.Pixel_image[i, j] = new Pixel("w");
+                                }
+                                else this.qr.Pixel_image[i, j] = new Pixel("b");
+                                counter++;
                             }
                             else this.qr.Pixel_image[i, j] = new Pixel("b");
-                            counter ++;
                         }
 
 
-                        
+
                         //this.qr.Pixel_image[i, j - 1] = new Pixel(150, 150, 150);
                     }
-                    /*if ((i < 9 && j - 1 < 9) || (i < 9 && j - 1 > this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 < 8)
+                    if ((i < 9 && j - 1 < 9) || (i < 9 && j - 1 > this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 < 8)
                         || i == 7 || j - 1 == 7 || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 == 8)) { }
                     else
                     {
-                        if (version_2 && (i < this.qr.Pixel_image.GetLength(0) - 9 || j < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
-                             || j > this.qr.Pixel_image.GetLength(1) - 5))
+                        if (version_2)
                         {
-                            if ((i + j-1) % 2 == 0 ^ bits[counter] == '0')
+                            if ((i < this.qr.Pixel_image.GetLength(0) - 9 || j - 1 < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
+                             || j - 1 > this.qr.Pixel_image.GetLength(1) - 5))
                             {
+                                if ((i + j - 1) % 2 == 0 ^ bits[counter] == '0')
+                                {
 
-                                this.qr.Pixel_image[i, j] = new Pixel("b");
+                                    this.qr.Pixel_image[i, j - 1] = new Pixel("w");
+                                }
+                                else this.qr.Pixel_image[i, j - 1] = new Pixel("b");
+                                counter++;
+
                             }
-                            else this.qr.Pixel_image[i, j] = new Pixel("w");
-                            counter ++;
-
                         }
                         else if (!version_2)
                         {
-                            if ((i + j-1) % 2 == 0 ^ bits[counter] == '0')
+                            if (counter < bits.Length)
                             {
+                                if ((i + j - 1) % 2 == 0 ^ bits[counter] == '0')
+                                {
 
-                                this.qr.Pixel_image[i, j] = new Pixel("b");
+                                    this.qr.Pixel_image[i, j - 1] = new Pixel("w");
+                                }
+                                else this.qr.Pixel_image[i, j - 1] = new Pixel("b");
+                                counter++;
                             }
-                            else this.qr.Pixel_image[i, j] = new Pixel("w");
-                            counter ++;
+                            else this.qr.Pixel_image[i, j - 1] = new Pixel("b");
                         }
-                        }*/
+
+                    }
 
 
 
@@ -191,6 +210,7 @@ namespace PSI_A2
                     //this.qr.Pixel_image[i, j - 1] = new Pixel(150, 150, 150);
 
                 }
+                monte = !monte;
             }
         }
 
@@ -220,7 +240,7 @@ namespace PSI_A2
                 Encoding(String_To_Save(19, 7), false);
 
             }
-            else if (this.my_string.Length < 48)
+            else if (this.my_string.Length < 48 && this.my_string.Length > 25)
             {
                 Pixel[,] pixel_qr = new Pixel[25, 25];
                 Mutual_Part(pixel_qr);
@@ -291,7 +311,7 @@ namespace PSI_A2
                 }
 
             }
-            
+
             return array_retour;
         }
 
@@ -318,13 +338,14 @@ namespace PSI_A2
                 retour_string += 0;
             }
 
+
             //Complément pour faire un multiple de 8
             for (int i = 0; i < retour_string.Length % 8; i++)
             {
                 retour_string += 0;
             }
             string temp = "";
-            
+
             //Ajoute les octets spécifiques 
             for (int i = 0; i < (((total_octet * 8 - retour_string.Length) / 8) - 7) * 8; i++)
             {
@@ -337,10 +358,12 @@ namespace PSI_A2
             byte[] ecc = ReedSolomonAlgorithm.Encode(buff, ec_octet, ErrorCorrectionCodeType.QRCode);
             for (int i = 0; i < ecc.Length; i++)
             {
-                my_string += Convert.ToString(ecc[i], 2);
+                retour_string += BinaryConverterFromInt(ecc[i], 8);
             }
             //Console.WriteLine(retour_string+"\n"+retour_string.Length);
-            
+            //Console.WriteLine(retour_string + "\n" + retour_string.Length);
+            //Console.WriteLine(String.Join(" ", ecc));
+
             return retour_string;
         }
 
@@ -380,7 +403,7 @@ namespace PSI_A2
 
 
 
-        /*private string BinaryConverterFromInt(int num, int taille = -1)
+        private string BinaryConverterFromInt(int num, int taille = -1)
         {
             string binary = "";
             int p = 0;
@@ -404,7 +427,7 @@ namespace PSI_A2
 
             }
             return binary;
-        }*/
+        }
 
         private byte[] String_To_ByteArray(string my_string)
         {
