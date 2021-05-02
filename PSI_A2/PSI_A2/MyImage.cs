@@ -12,8 +12,7 @@ namespace PSI_A2
         private int width_pixel;
         private int width_byte;
         private int height;
-        //private int bits_by_Color;
-        //private byte[,] image;
+       
         private byte[] header;
         private bool rigth_file = true;
 
@@ -24,12 +23,10 @@ namespace PSI_A2
         public MyImage(string type, int offset, byte[] header, Pixel[,] image)
         {
             this.type = type;
-            //this.taille = taille;
+            
             this.offset = offset;
             this.header = header;
-            //this.width_pixel = width;
-            //this.height = height;
-            //this.bits_by_Color = bits_by_Color;
+            
             this.pixel_image = image;
         }
 
@@ -274,61 +271,6 @@ namespace PSI_A2
             return retour;
         }
 
-        #region Test de Fonctions "Convertir_Int_To_Endian"
-        /*public byte[] Convertir_Int_To_Endian(int entier, int target_byte, byte[] res)
-        {
-
-
-            if (entier / Math.Pow(256, target_byte) > 1)
-            {
-                return res;
-            }
-            else if (target_byte <= 0) return res;
-            else if (entier / Math.Pow(256, target_byte - 1) >= 1)
-            {
-                res[target_byte - 1] = Convert.ToByte(Math.Floor(entier / Math.Pow(256, target_byte - 1)));
-                return Convertir_Int_To_Endian(entier - (Convert.ToInt32(entier / Math.Pow(256, target_byte - 1)) - 1) * Convert.ToInt32(Math.Pow(256, target_byte - 1)), target_byte - 1, res);
-            }
-            else if (entier / Math.Pow(256, target_byte - 1) < 1)
-            {
-                res[target_byte - 1] = 0;
-                return Convertir_Int_To_Endian(entier, target_byte - 1, res);
-            }
-
-            else return res;
-        }*/
-
-        /*public byte[] Convertir_Int_To_Endian(int entier, int target_byte)
-        {
-
-            int p = 0;
-
-            while ((entier / Convert.ToInt32(Math.Pow(256, p)) >= 1))
-            {
-                p++;
-            }
-
-            p--;
-
-            List<byte> tab = new List<byte>(p + 1);
-            for (int i = tab.Capacity - 1; i >= 0; i--)
-            {
-                tab[i] = Convert.ToByte(entier / Convert.ToInt32(Math.Pow(256, p)));
-                entier -= tab[i] * Convert.ToInt32(Math.Pow(256, p));
-                p--;
-            }
-
-            while (tab.Count < target_byte)
-            {
-                tab.Add(0);
-
-
-            }
-
-            return tab.ToArray();
-        }*/
-        #endregion
-
 
         public void Nuance_de_Gris()
         {
@@ -486,10 +428,8 @@ namespace PSI_A2
 
         public void Blur()
         {
-            //double[,] mat_blur = { { 1.0/9.0, 1.0/9.0, 1.0/9.0 }, { 1.0/9.0, 1.0/9.0, 1.0/9.0 }, { 1.0/9.0, 1.0/9.0, 1.0/9.0 } };
             int[,] mat_blur = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
-            //int[,] mat_blur = { { 1, 4, 6, 4, 1 }, { 4, 16, 24, 16, 4 }, { 6, 24, 36, 24, 6 }, { 4, 16, 24, 16, 4 } };
-            this.pixel_image = Convolution(mat_blur, 1.0 / 9.0);
+            this.pixel_image = Convolution(mat_blur);
 
 
         }
@@ -497,33 +437,12 @@ namespace PSI_A2
         public void Edges_detection()
         {
             int[,] mat = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
-            //Sobel detection
-            //int[,] mat = { { -1, 0, 1 }, { -1, 0, 1 }, { -1, 0, 1 } };
-            //int[,] mat = { { 1, 1, 1 }, { 0, 0, 0 }, { -1, -1, -1 } };
             this.pixel_image = Convolution(mat);
-            for (int i = 0; i < this.pixel_image.GetLength(0); i++)
-            {
-                for (int j = 0; j < this.pixel_image.GetLength(1); j++)
-                {
-                    if (this.pixel_image[i, j].R > 0 || this.pixel_image[i, j].G > 0 || this.pixel_image[i, j].B > 0)
-                    {
-                        this.pixel_image[i, j].R = 255;
-                        this.pixel_image[i, j].G = 255;
-                        this.pixel_image[i, j].B = 255;
-                    }
-                    else
-                    {
-                        this.pixel_image[i, j].R = 0;
-                        this.pixel_image[i, j].G = 0;
-                        this.pixel_image[i, j].B = 0;
-                    }
-                }
-            }
         }
 
         public void Repoussage()
         {
-            int[,] mat = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 1 } };
+            int[,] mat = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
             this.pixel_image = Convolution(mat);
         }
 
@@ -546,62 +465,71 @@ namespace PSI_A2
         }
 
 
-        public Pixel[,] Convolution(int[,] mat_conv, double coeff = 1)
+        public Pixel[,] Convolution(int[,] mat_conv)
         {
-
-            Pixel[,] new_matrix = this.pixel_image;
-
-            for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - (mat_conv.GetLength(0) / 2); i++)
+            Pixel[,] new_matrix = new Pixel[pixel_image.GetLength(0), pixel_image.GetLength(1)];
+            int sommer = 0;
+            int sommeg = 0;
+            int sommeb = 0;
+            int a = 0;
+            int b = 0;
+            int somme_noyau = 0;
+            for (int i = 0; i < mat_conv.GetLength(0); i++)
             {
-                for (int j = mat_conv.GetLength(1) / 2; j < new_matrix.GetLength(1) - (mat_conv.GetLength(1) / 2); j++)
+                for (int n = 0; n < mat_conv.GetLength(1); n++)
                 {
-                    int ope_red = 0;
-                    int ope_green = 0;
-                    int ope_blue = 0;
-
-                    for (int k = 0; k < mat_conv.GetLength(0); k++)
-                    {
-                        for (int l = 0; l < mat_conv.GetLength(1); l++)
-                        {
-                            ope_red += this.pixel_image[i + k - (mat_conv.GetLength(0) / 2), j + l - (mat_conv.GetLength(1) / 2)].R * mat_conv[k, l];
-                            ope_green += this.pixel_image[i + k - (mat_conv.GetLength(0) / 2), j + l - (mat_conv.GetLength(1) / 2)].G * mat_conv[k, l];
-                            ope_blue += this.pixel_image[i + k - (mat_conv.GetLength(0) / 2), j + l - (mat_conv.GetLength(1) / 2)].B * mat_conv[k, l];
-                        }
-                    }
-                    new_matrix[i, j] = new Pixel((byte)(coeff * ope_red), (byte)(coeff * ope_green), (byte)(coeff * ope_blue));
+                    somme_noyau = somme_noyau + mat_conv[i, n];
                 }
             }
-
-
-
-
-            /*for (int i = mat_conv.GetLength(0) / 2; i < new_matrix.GetLength(0) - mat_conv.GetLength(0) / 2; i++)
+            if (somme_noyau == 0)
             {
-                for (int j = mat_conv.GetLength(1) / 2; j < new_matrix.GetLength(1) - mat_conv.GetLength(1) / 2; j++)
+                somme_noyau = 0;
+                for (int i = 0; i < mat_conv.GetLength(0); i++)
                 {
-
-                    
-                    int ope_red = 0;
-                    int ope_green = 0;
-                    int ope_blue = 0;
-                    
-
-                    for (int k = -mat_conv.GetLength(0) / 2; k <= mat_conv.GetLength(0) / 2; k++)
+                    for (int n = 0; n < mat_conv.GetLength(1); n++)
                     {
-                        for (int l = -mat_conv.GetLength(1) / 2; l <= mat_conv.GetLength(1) / 2; l++)
+                        if (mat_conv[i, n] < 0)
                         {
-                            ope_red += this.pixel_image[i + k, j + l].R * mat_conv[k + (int)(mat_conv.GetLength(0) / 2), l + (int)(mat_conv.GetLength(1) / 2)];
-                            ope_green += this.pixel_image[i + k, j + l].G * mat_conv[k + (int)(mat_conv.GetLength(0) / 2), l + (int)(mat_conv.GetLength(1) / 2)];
-                            ope_blue += this.pixel_image[i + k, j + l].B * mat_conv[k + (int)(mat_conv.GetLength(0) / 2), l + (int)(mat_conv.GetLength(1) / 2)];
-
+                            somme_noyau = somme_noyau + mat_conv[i, n] * -1;
+                        }
+                        else
+                        {
+                            somme_noyau = somme_noyau + mat_conv[i, n];
                         }
                     }
-                    
-                    new_matrix[i, j] = new Pixel((byte)(ope_red), (byte)(ope_blue), (byte)(ope_green));
                 }
-            }*/
+            }
+            for (int i = 1; i < new_matrix.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < new_matrix.GetLength(1) - 1; j++)
+                {
+
+                    for (int k = i - 1; k <= i + 1; k++)
+                    {
+                        for (int l = j - 1; l <= j + 1; l++)
+                        {
+
+                            sommer = sommer + mat_conv[a, b] * this.pixel_image[k, l].R;
+                            sommeg = sommeg + mat_conv[a, b] * this.pixel_image[k, l].G;
+                            sommeb = sommeb + mat_conv[a, b] * this.pixel_image[k, l].B;
+                            b++;
+                        }
+                        a++;
+                        b = 0;
+                    }
+                    a = 0;
+                    new_matrix[i, j].R = (byte)(sommer / somme_noyau);
+                    new_matrix[i, j].G = (byte)(sommeg / somme_noyau);
+                    new_matrix[i, j].B = (byte)(sommeb / somme_noyau);
+                    sommer = 0;
+                    sommeg = 0;
+                    sommeb = 0;
+                }
+            }
             return new_matrix;
         }
+
+
 
         public void Affiche(bool only_header)
         {
@@ -609,19 +537,7 @@ namespace PSI_A2
 
             if (!only_header)
             {
-                /*Console.WriteLine("\n HEADER \n");
-                for (int i = 0; i < 14; i++)
-                {
-                    Console.Write(this.header[i] + " ");
-                }
-                Console.WriteLine("\n HEADER INFO \n");
-
-                for (int i = 14; i < 54; i++)
-                {
-                    Console.Write(this.header[i] + " ");
-
-                }*/
-
+                
 
 
 
