@@ -8,6 +8,7 @@ namespace PSI_A2
 
         private string writing_path;
         private MyImage qr;
+        private bool[,] modif;
 
 
         public QrCode(string _my_string, string writing_path)
@@ -46,11 +47,11 @@ namespace PSI_A2
         public void Qr_Save()
         {
             Pixel[,] temp = new Pixel[qr.Pixel_image.GetLength(0), qr.Pixel_image.GetLength(1)];
-            for(int i = 0; i < temp.GetLength(0); i++)
+            for (int i = 0; i < temp.GetLength(0); i++)
             {
-                for(int j = 0; j < temp.GetLength(1); j++)
+                for (int j = 0; j < temp.GetLength(1); j++)
                 {
-                    temp[i,j] = this.qr.Pixel_image[temp.GetLength(0) - 1 - i, j];
+                    temp[i, j] = this.qr.Pixel_image[temp.GetLength(0) - 1 - i, j];
                 }
             }
             this.qr.Pixel_image = temp;
@@ -108,23 +109,105 @@ namespace PSI_A2
         }
 
 
-        private void MandatoryPart_V1(Pixel[,] qr)
+        private void Encoding(string bits, bool version_2)
         {
-            /*for(int i = 0;i< qr.GetLength(0); i++)
-            {
-                for(int j = 0; j < qr.GetLength(1); j++)
-                {
-                    if( (i == 0 || i== 6 || i == qr.GetLength(0)-7 || i == qr.GetLength(0)-1)  && (j) )
-                }
-            }*/
-            Mutual_Part(qr);
 
+            bool monte = true;
+            
+            int counter = 0;
+            string mask = "111011111000100";
+            Console.WriteLine(bits.Length);
+            for (int i = this.qr.Pixel_image.GetLength(0) - 1; i >= 0; i--)
+            {
+                
+                for (int j = this.qr.Pixel_image.GetLength(1) - 1; j > 0; j -= 2)
+                {
+                    //if((i>7 && j>7) || (i>7 && this.qr.Pixel_image.GetLength(1) -8>j ) 
+                    //||(i< this.qr.Pixel_image.GetLength(0)-8 && j>8) && i!= 6 && j != 6)
+                    if ((i < 9 && j < 9) || (i < 9 && j > this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 9 && j < 8)
+                        || i == 7 || j == 7 || (i > this.qr.Pixel_image.GetLength(0) - 9 && j == 8)) ;
+
+                    else
+                    {
+                        if (version_2 && (i < this.qr.Pixel_image.GetLength(0) - 9 || j < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
+                             || j > this.qr.Pixel_image.GetLength(1) - 5))
+                        {
+                            Console.Write(counter + " ");
+                            if ( (i+j)%2 == 0 ^bits[counter] == '0' )
+                            {
+
+                                this.qr.Pixel_image[i, j] = new Pixel("w");
+                            }
+                            else this.qr.Pixel_image[i, j] = new Pixel("b");
+                            counter++;
+
+                        }
+                        else if (!version_2)
+                        {
+                            if ((i + j) % 2 == 0 ^ bits[counter] == '0')
+                            {
+
+                                this.qr.Pixel_image[i, j] = new Pixel("w");
+                            }
+                            else this.qr.Pixel_image[i, j] = new Pixel("b");
+                            counter ++;
+                        }
+
+
+                        
+                        //this.qr.Pixel_image[i, j - 1] = new Pixel(150, 150, 150);
+                    }
+                    /*if ((i < 9 && j - 1 < 9) || (i < 9 && j - 1 > this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 < 8)
+                        || i == 7 || j - 1 == 7 || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 == 8)) { }
+                    else
+                    {
+                        if (version_2 && (i < this.qr.Pixel_image.GetLength(0) - 9 || j < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
+                             || j > this.qr.Pixel_image.GetLength(1) - 5))
+                        {
+                            if ((i + j-1) % 2 == 0 ^ bits[counter] == '0')
+                            {
+
+                                this.qr.Pixel_image[i, j] = new Pixel("b");
+                            }
+                            else this.qr.Pixel_image[i, j] = new Pixel("w");
+                            counter ++;
+
+                        }
+                        else if (!version_2)
+                        {
+                            if ((i + j-1) % 2 == 0 ^ bits[counter] == '0')
+                            {
+
+                                this.qr.Pixel_image[i, j] = new Pixel("b");
+                            }
+                            else this.qr.Pixel_image[i, j] = new Pixel("w");
+                            counter ++;
+                        }
+                        }*/
+
+
+
+
+                    //this.qr.Pixel_image[i, j - 1] = new Pixel(150, 150, 150);
+
+                }
+            }
         }
 
-        /*private Pixel[,] MandatoryPart_V2(Pixel[,] qr)
+        private void MandatoryPart_V2(Pixel[,] qr)
         {
 
-        }*/
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    if (i == 2 && j == 2) qr[i + qr.GetLength(0) - 9, j + qr.GetLength(1) - 9] = new Pixel("b");
+                    else if (i == 0 || j == 0 || j == 4 || i == 4) qr[i + qr.GetLength(0) - 9, j + qr.GetLength(1) - 9] = new Pixel("b");
+                    else qr[i + qr.GetLength(0) - 9, j + qr.GetLength(1) - 9] = new Pixel("w");
+                }
+            }
+
+        }
 
         public void QrCode_Generator()
         {
@@ -134,14 +217,16 @@ namespace PSI_A2
                 Pixel[,] pixel_qr = new Pixel[21, 21];
                 Mutual_Part(pixel_qr);
                 this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
-
+                Encoding(String_To_Save(19, 7), false);
 
             }
             else if (this.my_string.Length < 48)
             {
                 Pixel[,] pixel_qr = new Pixel[25, 25];
                 Mutual_Part(pixel_qr);
+                MandatoryPart_V2(pixel_qr);
                 this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
+                Encoding(String_To_Save(34, 10), true);
 
 
             }
@@ -206,12 +291,12 @@ namespace PSI_A2
                 }
 
             }
-            Console.WriteLine(String.Join(" ", array_retour));
+            
             return array_retour;
         }
 
 
-        public string String_To_Save(int total_octet,int ec_octet)
+        public string String_To_Save(int total_octet, int ec_octet)
         {
             string retour_string = "0010";
             string specific_octet_1 = "1110110000010001";
@@ -222,11 +307,11 @@ namespace PSI_A2
 
             //Données encodées avec un test pour savoir s'il faut l'encoder sur 11 ou 6 bits
             for (int i = 0; i < result_int.Length; i++)
-            {   
+            {
                 retour_string += (this.my_string.Length % 2 == 1 && i == result_int.Length - 1) ?
                     Convert.ToString(result_int[i], 2).PadLeft(6, '0') : Convert.ToString(result_int[i], 2).PadLeft(11, '0');
             }
-            
+
             //Terminaison
             for (int i = 0; i < 4 && retour_string.Length < total_octet * 8; i++)
             {
@@ -234,28 +319,28 @@ namespace PSI_A2
             }
 
             //Complément pour faire un multiple de 8
-            for(int i = 0; i < retour_string.Length % 8; i++)
+            for (int i = 0; i < retour_string.Length % 8; i++)
             {
                 retour_string += 0;
             }
             string temp = "";
-            Console.WriteLine(retour_string.Length);
+            
             //Ajoute les octets spécifiques 
-            for (int i = 0; i < (((total_octet * 8 - retour_string.Length) / 8) - 7) * 8;  i++)
+            for (int i = 0; i < (((total_octet * 8 - retour_string.Length) / 8) - 7) * 8; i++)
             {
                 temp += specific_octet_1[(i) % 16];
-                
+
             }
             retour_string += temp;
 
             byte[] buff = String_To_ByteArray(retour_string);
             byte[] ecc = ReedSolomonAlgorithm.Encode(buff, ec_octet, ErrorCorrectionCodeType.QRCode);
-            for(int i = 0; i < ecc.Length; i++)
+            for (int i = 0; i < ecc.Length; i++)
             {
-                my_string += Convert.ToString(ecc[i],2);
+                my_string += Convert.ToString(ecc[i], 2);
             }
             //Console.WriteLine(retour_string+"\n"+retour_string.Length);
-            Console.WriteLine(string.Join(" ",ecc));
+            
             return retour_string;
         }
 
@@ -323,15 +408,15 @@ namespace PSI_A2
 
         private byte[] String_To_ByteArray(string my_string)
         {
-            byte[] retour = new byte[my_string.Length/8];
-            for(int i = 0; i < my_string.Length; i+=8)
+            byte[] retour = new byte[my_string.Length / 8];
+            for (int i = 0; i < my_string.Length; i += 8)
             {
                 byte temp = 0;
                 for (int j = 0; j < 8; j++)
                 {
                     temp = (byte)(temp << 1);
-                    temp = (byte)(temp |((int)(my_string[i + j]) - 48));
-                    
+                    temp = (byte)(temp | ((int)(my_string[i + j]) - 48));
+
                 }
                 retour[i / 8] = temp;
             }
