@@ -11,6 +11,12 @@ namespace PSI_A2
         private bool[,] modif;
 
 
+        /// <summary>
+        /// Constructeur unique de notre QRcode avec un string à cacher et un chemin d'écriture du QRcode
+        /// </summary>
+        /// <param name="_my_string"></param>
+        /// <param name="writing_path"></param>
+
         public QrCode(string _my_string, string writing_path)
         {
             this.my_string = _my_string.ToUpper();
@@ -18,6 +24,11 @@ namespace PSI_A2
 
             QrCode_Generator();
         }
+
+        /// <summary>
+        /// Fonction générant le header de notre QRcode pour pouvoir l'enregistrer
+        /// </summary>
+        /// <returns></returns>
 
         private byte[] Header_Generator()
         {
@@ -44,6 +55,10 @@ namespace PSI_A2
             return header;
         }
 
+        /// <summary>
+        /// Fonction d'enregistrement du QRcode, appelant la fonction FromImageToFile de la class MyImage
+        /// </summary>
+
         public void Qr_Save()
         {
             Pixel[,] temp = new Pixel[qr.Pixel_image.GetLength(0), qr.Pixel_image.GetLength(1)];
@@ -58,6 +73,11 @@ namespace PSI_A2
             this.qr.FromImageToFile(this.writing_path);
         }
 
+
+        /// <summary>
+        /// Fonction générant les caractères commun à tous les QRcodes (les motifs d'alignements et de synchronisation)
+        /// </summary>
+        /// <param name="qr"></param>
         private void Mutual_Part(Pixel[,] qr)
         {
             for (int i = 0; i < 7; i++)
@@ -109,6 +129,11 @@ namespace PSI_A2
         }
 
 
+        /// <summary>
+        /// Fonction encodant le string dans le QRcode. Booléen qui indique si nous sommes en version 1 ou 2
+        /// </summary>
+        /// <param name="bits"></param>
+        /// <param name="version_2"></param>
         private void Encoding(string bits, bool version_2)
         {
 
@@ -178,6 +203,11 @@ namespace PSI_A2
             }
         }
 
+
+        /// <summary>
+        /// Fonction ajoutant le motif de recherche pour la version 2 du QRCode
+        /// </summary>
+        /// <param name="qr"></param>
         private void MandatoryPart_V2(Pixel[,] qr)
         {
 
@@ -192,6 +222,10 @@ namespace PSI_A2
             }
 
         }
+
+        /// <summary>
+        /// Fonction regroupant les différents fonctions de notre classe et générant notre QRcode
+        /// </summary>
 
         public void QrCode_Generator()
         {
@@ -219,7 +253,12 @@ namespace PSI_A2
 
 
         }
-
+        
+        /// <summary>
+        /// Fonction retournant le tableau d'entier nécessaire au QRcode à partir du string que nous voulons encoder
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
         public int[] String_To_Int(string arg)
         {
 
@@ -279,7 +318,12 @@ namespace PSI_A2
             return array_retour;
         }
 
-
+        /// <summary>
+        /// Fonction qui retourne le string de bits à encoder dans le QRcode en utilisant notamment la classe ReedSolomon
+        /// </summary>
+        /// <param name="total_octet"></param>
+        /// <param name="ec_octet"></param>
+        /// <returns></returns>
         public string String_To_Save(int total_octet, int ec_octet)
         {
             string retour_string = "0010";
@@ -336,6 +380,11 @@ namespace PSI_A2
             return retour_string;
         }
 
+
+        /// <summary>
+        /// Afficahge du Qrcode entier ou seulement du header
+        /// </summary>
+        /// <param name="only_header"></param>
         public void Affiche(bool only_header)
         {
             if (only_header)
@@ -371,7 +420,12 @@ namespace PSI_A2
         }
 
 
-
+        /// <summary>
+        /// Convertis un entier en un string de bits
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="taille"></param>
+        /// <returns></returns>
         private string BinaryConverterFromInt(int num, int taille = -1)
         {
             string binary = "";
@@ -397,7 +451,11 @@ namespace PSI_A2
             }
             return binary;
         }
-
+        /// <summary>
+        /// Transforme un string en un tableau d'octets
+        /// </summary>
+        /// <param name="my_string"></param>
+        /// <returns></returns>
         private byte[] String_To_ByteArray(string my_string)
         {
             byte[] retour = new byte[my_string.Length / 8];

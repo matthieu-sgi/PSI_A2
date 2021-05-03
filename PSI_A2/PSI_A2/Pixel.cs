@@ -12,6 +12,12 @@ namespace PSI_A2
         private byte g;
         private byte b;
         
+        /// <summary>
+        /// Constructeur d'un pixel avec des valeurs RGB en entrée
+        /// </summary>
+        /// <param name="red"></param>
+        /// <param name="green"></param>
+        /// <param name="blue"></param>
         public Pixel(byte _r,byte _g,byte _b)
         {
 
@@ -20,6 +26,10 @@ namespace PSI_A2
             this.b = _b;
         }
 
+        /// <summary>
+        /// Constructeur d'un pixel avec des un string en entrée, soit 'w' pour white ou 'b' pour black
+        /// </summary>
+        /// <param name="color"></param>
         public Pixel(string color)
         {
             color = color.ToLower();
@@ -44,17 +54,31 @@ namespace PSI_A2
             } 
         }
 
+
+        /// <summary>
+        /// Accesseur de la valeur du pixel rouge
+        /// </summary>
+        /// <value></value>
         public byte R
         {
             get { return r; }
             set { r = value; }
         }
 
+        /// <summary>
+        /// Accesseur de la valeur du pixel vert
+        /// </summary>
+        /// <value></value>
         public byte G
         {
             get { return g; }
             set { g = value; }
         }
+
+        /// <summary>
+        /// Accesseur de la valeur du pixel bleu
+        /// </summary>
+        /// <value></value>
         public byte B
         {
             get { return b; }
