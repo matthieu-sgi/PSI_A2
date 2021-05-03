@@ -353,7 +353,7 @@ namespace PSI_A2
 
         public void QrCode_Generator()
         {
-            string str_to_hide = "";
+            
             if (this.my_string.Length < 26)
             {
                 Pixel[,] pixel_qr = new Pixel[21, 21];
