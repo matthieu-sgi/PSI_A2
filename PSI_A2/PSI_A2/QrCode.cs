@@ -22,6 +22,8 @@ namespace PSI_A2
             this.my_string = _my_string.ToUpper();
             this.writing_path = writing_path;
 
+            
+
             QrCode_Generator();
         }
 
@@ -119,11 +121,11 @@ namespace PSI_A2
             //Motifs de synchronisation
             for (int j = 9; j < qr.GetLength(1) - 7 - 1; j += 2)
             {
-                qr[7, j] = new Pixel("w");
+                qr[6, j] = new Pixel("w");
             }
             for (int i = 9; i < qr.GetLength(0) - 7 - 1; i += 2)
             {
-                qr[i, 7] = new Pixel("w");
+                qr[i, 6] = new Pixel("w");
             }
 
         }
@@ -140,24 +142,25 @@ namespace PSI_A2
             bool monte = true;
             string mask = "111011111000100";
             int counter = 0;
+           
             
-            Console.WriteLine(bits.Length);
             int offset = 0;
-            for (int j = 0; j < qr.Pixel_image.GetLength(1) / 2; j++)
+            for (int j = 0; j < (this.qr.Pixel_image.GetLength(1)/2) ; j++)
             {
 
                 
-                for (int y = monte ? this.qr.Pixel_image.GetLength(0) - 1 : 0; monte ? y >= 0 : y<this.qr.Pixel_image.GetLength(0);y= monte ? y-- : y++)
+                for (int y = monte ? this.qr.Pixel_image.GetLength(0) - 1 : 0; monte ? y >= 0 : y<this.qr.Pixel_image.GetLength(0);y+= monte ? -1 :+1)
                 {
-                    for (int x = this.qr.Pixel_image.GetLength(0)-offset; x> this.qr.Pixel_image.GetLength(0) - offset-2; x --)
+                    for (int x = this.qr.Pixel_image.GetLength(0)-1-offset; x> this.qr.Pixel_image.GetLength(0) - offset-3; x --)
                     {
-
                         
                         if ((y < 9 && x < 9) || (y < 9 && x > this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 9 && x < 8)
-                            || y == 7 || x == 7 || (y > this.qr.Pixel_image.GetLength(0) - 9 && x == 8)) ;
+                            || y == 6 || x == 6 || (y > this.qr.Pixel_image.GetLength(0) - 9 && x == 8)) continue;
 
                         else
                         {
+
+
                             if (version_2)
                             {
                                 if ((y < this.qr.Pixel_image.GetLength(0) - 9 || x < this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 5
@@ -165,7 +168,11 @@ namespace PSI_A2
                                 {
 
                                     Console.Write(counter + " ");
-                                    if ((y + x) % 2 == 0 ^ bits[counter] == '0')
+                                    if(bits.Length<= counter)
+                                    {
+                                        this.qr.Pixel_image[y, x] = new Pixel("b");
+                                    }
+                                    else if (bits[counter] == '0')
                                     {
 
                                         this.qr.Pixel_image[y, x] = new Pixel("w");
@@ -177,19 +184,19 @@ namespace PSI_A2
                             }
                             else if (!version_2)
                             {
-                                if (counter < bits.Length)
-                                {
-                                    Console.Write(counter + " ");
-                                    if ((y + x) % 2 == 0 ^ bits[counter] == '0')
-                                    {
 
-                                        this.qr.Pixel_image[y, x] = new Pixel("w");
-                                    }
-                                    else this.qr.Pixel_image[y, x] = new Pixel("b");
-                                    counter++;
+                                Console.Write(counter + " ");
+                                
+                                if (bits[counter] == '0')
+                                {
+
+                                    this.qr.Pixel_image[y, x] = new Pixel("w");
                                 }
-                                else this.qr.Pixel_image[y,x] = new Pixel("b");
+                                else this.qr.Pixel_image[y, x] = new Pixel("b");
+                                counter++;
                             }
+
+
 
 
                         }
@@ -197,11 +204,124 @@ namespace PSI_A2
 
                     }
                     
+                    
                 }
                 monte = !monte;
                 offset += 2;
+                if(this.qr.Pixel_image.GetLength(0) - 1 - offset == 6)
+                {
+                    offset++;
+                }
             }
+            offset = 0;
+            counter = 0;
+
+            for (int j = 0; j < (this.qr.Pixel_image.GetLength(1) / 2); j++)
+            {
+
+
+                for (int y = monte ? this.qr.Pixel_image.GetLength(0) - 1 : 0; monte ? y >= 0 : y < this.qr.Pixel_image.GetLength(0); y += monte ? -1 : +1)
+                {
+                    for (int x = this.qr.Pixel_image.GetLength(0) - 1 - offset; x > this.qr.Pixel_image.GetLength(0) - offset - 3; x--)
+                    {
+
+                        if ((y < 9 && x < 9) || (y < 9 && x > this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 9 && x < 8)
+                            || y == 6 || x == 6 || (y > this.qr.Pixel_image.GetLength(0) - 9 && x == 8)) continue;
+
+                        else
+                        {
+
+
+                            if (version_2)
+                            {
+                                if ((y < this.qr.Pixel_image.GetLength(0) - 9 || x < this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 5
+                                 || x > this.qr.Pixel_image.GetLength(1) - 5))
+                                {
+
+                                    if (bits.Length <= counter)
+                                    {
+                                        this.qr.Pixel_image[y, x] = new Pixel("b");
+                                    }
+                                    if ((x + y) % 2 == 0 ^ this.qr.Pixel_image[y, x].IsWhite)
+                                    {
+
+                                        this.qr.Pixel_image[y, x] = new Pixel("w");
+                                    }
+                                    else this.qr.Pixel_image[y, x] = new Pixel("b");
+                                    counter++;
+
+                                }
+                            }
+                            else if (!version_2)
+                            {
+
+                                Console.Write(counter + " ");
+                                
+                                if ((x+y)%2 == 0 ^ this.qr.Pixel_image[y,x].IsWhite)
+                                {
+
+                                    this.qr.Pixel_image[y, x] = new Pixel("w");
+                                }
+                                else this.qr.Pixel_image[y, x] = new Pixel("b");
+                                counter++;
+                            }
+
+
+
+
+                        }
+
+
+                    }
+
+
+                }
+                monte = !monte;
+                offset += 2;
+                if (this.qr.Pixel_image.GetLength(0) - 1 - offset == 6)
+                {
+                    offset++;
+                }
+            }
+
+
+
+
+            //partie du code qui ajoute les bits de masques de manière peu propre
+            
+            
+            for(int i = 0;i < mask.Length; i++)
+            {
+                bool temp = (mask[i] == '0') ? true : false;
+                if (i < 6)
+                {
+                    this.qr.Pixel_image[8, i] = new Pixel(temp  );
+                    this.qr.Pixel_image[this.qr.Pixel_image.GetLength(0)-1-i,8] = new Pixel(temp);
+                }
+                else if (i > 8)
+                {
+                    this.qr.Pixel_image[8, this.qr.Pixel_image.GetLength(1)-15+i] = new Pixel(temp);
+                    this.qr.Pixel_image[14-i, 8] = new Pixel(temp);
+                }
+                else if(i == 6)
+                {
+                    this.qr.Pixel_image[this.qr.Pixel_image.GetLength(0) - 1 - i, 8] = new Pixel(temp);
+                    this.qr.Pixel_image[8, 7] = new Pixel(temp);
+
+                    
+                }else
+                {
+                    this.qr.Pixel_image[8, this.qr.Pixel_image.GetLength(1) - 15 + i] = new Pixel(temp);
+                    this.qr.Pixel_image[15 - i, 8] = new Pixel(temp);
+                }
+            }
+
+
+
+
         }
+
+
 
 
         /// <summary>

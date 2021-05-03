@@ -34,7 +34,7 @@ namespace PSI_A2
             }
             else path += nom_image;*/
             MyImage image = new MyImage(path);
-            QrCode qr = new QrCode("HELLO WORLD", writing_path);
+            QrCode qr = new QrCode("J'ai reussi mon qrcode et j'en suis fier", writing_path);
 
             #region Menu sympathique
 

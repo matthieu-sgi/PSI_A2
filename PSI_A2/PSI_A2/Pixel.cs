@@ -26,6 +26,21 @@ namespace PSI_A2
             this.b = _b;
         }
 
+        public Pixel(bool isWhite)
+        {
+            if (isWhite)
+            {
+                this.r = 255;
+                this.g = 255;
+                this.b = 255;
+            }else
+            {
+                this.r = 0;
+                this.g = 0;
+                this.b = 0;
+            }
+        }
+
         /// <summary>
         /// Constructeur d'un pixel avec des un string en entrée, soit 'w' pour white ou 'b' pour black
         /// </summary>
@@ -83,6 +98,11 @@ namespace PSI_A2
         {
             get { return b; }
             set { b = value; }
+        }
+
+        public bool IsWhite
+        {
+            get { return (r == 255 && g == 255 && b == 255); }
         }
 
 
