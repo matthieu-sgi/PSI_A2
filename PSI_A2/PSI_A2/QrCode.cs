@@ -22,7 +22,7 @@ namespace PSI_A2
             this.my_string = _my_string.ToUpper();
             this.writing_path = writing_path;
 
-            
+
 
             QrCode_Generator();
         }
@@ -142,18 +142,19 @@ namespace PSI_A2
             bool monte = true;
             string mask = "111011111000100";
             int counter = 0;
-           
-            
+
+
             int offset = 0;
-            for (int j = 0; j < (this.qr.Pixel_image.GetLength(1)/2) ; j++)
+            //Boucle plaçant les bits de mon string sur le QrCode
+            for (int j = 0; j < (this.qr.Pixel_image.GetLength(1) / 2); j++)
             {
 
-                
-                for (int y = monte ? this.qr.Pixel_image.GetLength(0) - 1 : 0; monte ? y >= 0 : y<this.qr.Pixel_image.GetLength(0);y+= monte ? -1 :+1)
+
+                for (int y = monte ? this.qr.Pixel_image.GetLength(0) - 1 : 0; monte ? y >= 0 : y < this.qr.Pixel_image.GetLength(0); y += monte ? -1 : +1)
                 {
-                    for (int x = this.qr.Pixel_image.GetLength(0)-1-offset; x> this.qr.Pixel_image.GetLength(0) - offset-3; x --)
+                    for (int x = this.qr.Pixel_image.GetLength(0) - 1 - offset; x > this.qr.Pixel_image.GetLength(0) - offset - 3; x--)
                     {
-                        
+
                         if ((y < 9 && x < 9) || (y < 9 && x > this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 9 && x < 8)
                             || y == 6 || x == 6 || (y > this.qr.Pixel_image.GetLength(0) - 9 && x == 8)) continue;
 
@@ -168,7 +169,7 @@ namespace PSI_A2
                                 {
 
                                     Console.Write(counter + " ");
-                                    if(bits.Length<= counter)
+                                    if (bits.Length <= counter)
                                     {
                                         this.qr.Pixel_image[y, x] = new Pixel("b");
                                     }
@@ -186,7 +187,7 @@ namespace PSI_A2
                             {
 
                                 Console.Write(counter + " ");
-                                
+
                                 if (bits[counter] == '0')
                                 {
 
@@ -200,22 +201,25 @@ namespace PSI_A2
 
 
                         }
-                        
+
 
                     }
-                    
-                    
+
+
                 }
                 monte = !monte;
                 offset += 2;
-                if(this.qr.Pixel_image.GetLength(0) - 1 - offset == 6)
+                if (this.qr.Pixel_image.GetLength(0) - 1 - offset == 6)
                 {
                     offset++;
                 }
             }
+            
             offset = 0;
             counter = 0;
 
+            
+            //Boucle appliquant le masque au QrCode
             for (int j = 0; j < (this.qr.Pixel_image.GetLength(1) / 2); j++)
             {
 
@@ -242,7 +246,7 @@ namespace PSI_A2
                                     {
                                         this.qr.Pixel_image[y, x] = new Pixel("b");
                                     }
-                                    if ((x + y) % 2 == 0 ^ this.qr.Pixel_image[y, x].IsWhite)
+                                    else if ((x + y) % 2 == 0 ^ this.qr.Pixel_image[y, x].IsWhite)
                                     {
 
                                         this.qr.Pixel_image[y, x] = new Pixel("w");
@@ -256,8 +260,8 @@ namespace PSI_A2
                             {
 
                                 Console.Write(counter + " ");
-                                
-                                if ((x+y)%2 == 0 ^ this.qr.Pixel_image[y,x].IsWhite)
+
+                                if ((x + y) % 2 == 0 ^ this.qr.Pixel_image[y, x].IsWhite)
                                 {
 
                                     this.qr.Pixel_image[y, x] = new Pixel("w");
@@ -287,29 +291,29 @@ namespace PSI_A2
 
 
 
-            //partie du code qui ajoute les bits de masques de manière peu propre
-            
-            
-            for(int i = 0;i < mask.Length; i++)
+            //partie du code qui ajoute les bits de masques aux endroits nécessaires
+
+            for (int i = 0; i < mask.Length; i++)
             {
                 bool temp = (mask[i] == '0') ? true : false;
                 if (i < 6)
                 {
-                    this.qr.Pixel_image[8, i] = new Pixel(temp  );
-                    this.qr.Pixel_image[this.qr.Pixel_image.GetLength(0)-1-i,8] = new Pixel(temp);
+                    this.qr.Pixel_image[8, i] = new Pixel(temp);
+                    this.qr.Pixel_image[this.qr.Pixel_image.GetLength(0) - 1 - i, 8] = new Pixel(temp);
                 }
                 else if (i > 8)
                 {
-                    this.qr.Pixel_image[8, this.qr.Pixel_image.GetLength(1)-15+i] = new Pixel(temp);
-                    this.qr.Pixel_image[14-i, 8] = new Pixel(temp);
+                    this.qr.Pixel_image[8, this.qr.Pixel_image.GetLength(1) - 15 + i] = new Pixel(temp);
+                    this.qr.Pixel_image[14 - i, 8] = new Pixel(temp);
                 }
-                else if(i == 6)
+                else if (i == 6)
                 {
                     this.qr.Pixel_image[this.qr.Pixel_image.GetLength(0) - 1 - i, 8] = new Pixel(temp);
                     this.qr.Pixel_image[8, 7] = new Pixel(temp);
 
-                    
-                }else
+
+                }
+                else
                 {
                     this.qr.Pixel_image[8, this.qr.Pixel_image.GetLength(1) - 15 + i] = new Pixel(temp);
                     this.qr.Pixel_image[15 - i, 8] = new Pixel(temp);
@@ -373,7 +377,7 @@ namespace PSI_A2
 
 
         }
-        
+
         /// <summary>
         /// Fonction retournant le tableau d'entier nécessaire au QRcode à partir du string que nous voulons encoder
         /// </summary>
@@ -484,8 +488,7 @@ namespace PSI_A2
 
             }
 
-            Console.WriteLine(retour_string.Length);
-            Console.WriteLine(retour_string);
+            
             byte[] buff = String_To_ByteArray(retour_string);
 
             byte[] ecc = ReedSolomonAlgorithm.Encode(buff, ec_octet, ErrorCorrectionCodeType.QRCode);
@@ -495,7 +498,7 @@ namespace PSI_A2
             }
             //Console.WriteLine(retour_string+"\n"+retour_string.Length);
             //Console.WriteLine(retour_string + "\n" + retour_string.Length);
-            Console.WriteLine(String.Join(" ", ecc));
+           
 
             return retour_string;
         }
@@ -571,6 +574,8 @@ namespace PSI_A2
             }
             return binary;
         }
+
+        
         /// <summary>
         /// Transforme un string en un tableau d'octets
         /// </summary>

@@ -26,6 +26,10 @@ namespace PSI_A2
             this.b = _b;
         }
 
+        /// <summary>
+        /// Fonction qui attribue la couleur blanche à un pixel si le paramètre est True, sinon la couleur noire
+        /// </summary>
+        /// <param name="isWhite"></param>
         public Pixel(bool isWhite)
         {
             if (isWhite)
@@ -100,6 +104,11 @@ namespace PSI_A2
             set { b = value; }
         }
 
+
+        /// <summary>
+        /// Accesseur qui retourne true si le pixel est blanc et false sinon
+        /// </summary>
+        /// <value></value>
         public bool IsWhite
         {
             get { return (r == 255 && g == 255 && b == 255); }

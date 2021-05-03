@@ -139,7 +139,7 @@ namespace PSI_A2
 
                 byte[] image_to_write = new byte[this.taille];
 
-                Console.WriteLine("Calcul : " + (pixel_image.GetLength(1) * pixel_image.GetLength(0) * 24) / 8);
+               
 
                 //Console.WriteLine(image_to_write.Length);
 
@@ -181,7 +181,6 @@ namespace PSI_A2
 
                 File.WriteAllBytes(file, image_to_write);
 
-                Console.WriteLine("Save and Done");
             }
 
         }

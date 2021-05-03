@@ -19,7 +19,7 @@ namespace PSI_A2
 
 
 
-            string exit = "exit";
+            string exit="";
             /*Console.WriteLine("Veuillez entrer le nom du fichier de résultat en spécifiant l'extension (.bmp) : ");
             string nom_image = Console.ReadLine();
             writing_path += nom_image;
@@ -34,7 +34,7 @@ namespace PSI_A2
             }
             else path += nom_image;*/
             MyImage image = new MyImage(path);
-            QrCode qr = new QrCode("J'ai reussi mon qrcode et j'en suis fier", writing_path);
+
 
             #region Menu sympathique
 
@@ -52,6 +52,7 @@ namespace PSI_A2
                                     "\n10- Repoussage" +
                                     "\n11- Renforcement des bords" +
                                     "\n12- Histogramme" +
+                                    "\n13- QrCode"+
                                     "\nEntrer \"exit\" pour quitter");
                 exit = Console.ReadLine();
                 switch (exit)
@@ -59,35 +60,35 @@ namespace PSI_A2
                     case "1":
                         image.Affiche(false);
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "2":
                         image.Miror(true);
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "3":
                         image.Miror(false);
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "4":
                         image.Nuance_de_Gris();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "5":
                         image.Noir_et_Blanc();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
@@ -115,7 +116,7 @@ namespace PSI_A2
                         }
                         image.Resize(new_height, new_width);
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
@@ -123,7 +124,7 @@ namespace PSI_A2
                     case "7":
                         image.Blur();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
@@ -140,42 +141,51 @@ namespace PSI_A2
                         }
                         image.Rotation(angle);
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "9":
-                        Console.Write("L'outil détection des contours ne fonctionne pas vraiment, il le sera lors de la prochaine mise à jour :)");
+                        
                         image.Edges_detection();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "10":
-                        Console.Write("L'outil repoussage ne fonctionne pas vraiment, il le sera lors de la prochaine mise à jour :)");
+                        
                         image.Repoussage();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "11":
-                        Console.Write("L'outil renforcement des contours ne fonctionne pas vraiment, il le sera lors de la prochaine mise à jour :)");
+                        
                         image.EdgesReinforcement();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and Done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case "12":
                         image.Histogramme();
                         image.FromImageToFile(writing_path);
-                        Console.WriteLine("Save and done");
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
-                    case "exit":
+                    case "13" : 
+                        Console.WriteLine("Quel string voulez-vous cacher (alphanumérique seulement) ?");
+                        QrCode qrcode = new QrCode(Console.ReadLine(),writing_path);
+                        qrcode.Qr_Save();
+                        Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
+                        Console.ReadKey();
+                        Console.Clear();
+                        break;
+
+                     case "exit":
                         Console.WriteLine("Au revoir");
                         Console.ReadKey();
                         break;
@@ -190,36 +200,9 @@ namespace PSI_A2
             }
             #endregion
 
-            //image.Rotation(Math.PI / 4);
-            //image.Affiche(true);
-            //image.Miror(false);
-            //image.Miror(false);
-            /*image.Affiche(true);
-            Console.WriteLine();*/
-            //Console.WriteLine(traie.Height_Pixel);
-            //image.Nuance_de_Gris();
-            //image.Resize(500, 500);
-            //image.Repoussage();
-            //image.Edges_detection();
-            //image.Blur();
-            /*byte[] tab = { 54, 0, 12, 0 };
-            Console.WriteLine(image.Convertir_Endian_To_Int(tab));*/
+            
 
-            //image.FromImageToFile(writing_path);
-            //qr.Affiche(false);
-            //qr.String_To_Int("hello wOrlD");
-            qr.Qr_Save();
-            /*Console.WriteLine((int)(' '));
-            Console.WriteLine((int)('$'));
-            Console.WriteLine((int)('%'));
-            Console.WriteLine((int)('*'));
-            Console.WriteLine((int)('-'));
-            Console.WriteLine((int)('.'));
-            Console.WriteLine((int)('/'));
-            Console.WriteLine((int)(':'));*/
-            //qr.String_To_Save(19,7  );
-
-
+            
             Console.ReadKey();
         }
     }
