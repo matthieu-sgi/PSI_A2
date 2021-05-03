@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Drawing;
 
 
 
@@ -10,7 +8,7 @@ namespace PSI_A2
     {
         static void Main(string[] args)
         {
-            
+
 
             string path = @"..\..\..\Images\tigre.bmp";
             string writing_path = @"..\..\..\Images\test.bmp";
@@ -96,14 +94,14 @@ namespace PSI_A2
                     case "6":
                         int new_width;
                         int new_height;
-                        
+
                         Console.Write("Veuillez entrer une longueur entière : ");
                         bool right_width = int.TryParse(Console.ReadLine(), out new_width);
                         Console.Write("Veuillez entrer une largeur entière : ");
                         bool rigth_height = int.TryParse(Console.ReadLine(), out new_height);
                         while (!right_width)
                         {
-                            
+
                             Console.Write("Veuillez entrer une longueur entière svp : ");
                             right_width = int.TryParse(Console.ReadLine(), out new_width);
 
@@ -131,15 +129,15 @@ namespace PSI_A2
                         break;
                     case "8":
                         double angle;
-                        
+
                         Console.Write("Veuillez entrer une valeur d'angle en degré : ");
                         bool temp = double.TryParse(Console.ReadLine(), out angle);
                         while (!temp)
                         {
                             Console.Write("Veuillez entrer un double svp : ");
                             temp = double.TryParse(Console.ReadLine(), out angle);
-                            
-                        } 
+
+                        }
                         image.Rotation(angle);
                         image.FromImageToFile(writing_path);
                         Console.WriteLine("Save and Done");
@@ -220,7 +218,7 @@ namespace PSI_A2
             Console.WriteLine((int)('/'));
             Console.WriteLine((int)(':'));*/
             //qr.String_To_Save(19,7  );
-            
+
 
             Console.ReadKey();
         }

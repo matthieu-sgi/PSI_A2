@@ -12,23 +12,34 @@ namespace PSI_A2
         private int width_pixel;
         private int width_byte;
         private int height;
-       
+
         private byte[] header;
         private bool rigth_file = true;
 
         private Pixel[,] pixel_image;
 
 
-
+        /// <summary>
+        /// Constructeur permettant de créer une image à partir de sa propre matrice de Pixel
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="offset"></param>
+        /// <param name="header"></param>
+        /// <param name="Matrice_Pixel"></param>
         public MyImage(string type, int offset, byte[] header, Pixel[,] image)
         {
             this.type = type;
-            
+
             this.offset = offset;
             this.header = header;
-            
+
             this.pixel_image = image;
         }
+
+        /// <summary>
+        /// Constructeur permettant d'importer une image à partir d'un fichier donné
+        /// </summary>
+        /// <param name="path"></param>
 
         public MyImage(string myfile)
         {
@@ -93,20 +104,21 @@ namespace PSI_A2
 
             }
         }
-        public int Width_Pixel
-        {
-            get { return this.pixel_image.GetLength(1); }
-        }
 
-        public int Height_Pixel
-        {
-            get { return this.pixel_image.GetLength(0); }
-        }
+        /// <summary>
+        /// Accesseur permettant de vérifier l'existence du fichier entré
+        /// </summary>
+        /// <value></value>
+
         public bool Right_File
         {
             get { return rigth_file; }
         }
 
+        /// <summary>
+        /// Accesseur permettant d'accéder et de modifier la matrice de pixel
+        /// </summary>
+        /// <value></value>
         public Pixel[,] Pixel_image
         {
             get { return this.pixel_image; }
@@ -114,17 +126,20 @@ namespace PSI_A2
         }
 
 
-
+        /// <summary>
+        /// Méthode permettant de transformer notre objet de la class MyImage en une image Bitmap
+        /// </summary>
+        /// <param name="path_to_write"></param>
         public void FromImageToFile(string file)
         {
             if (this.type == "BM")
             {
                 int width_to_save = (((pixel_image.GetLength(1) * 3) + 3) / 4) * 4;
                 this.taille = this.offset + width_to_save * pixel_image.GetLength(0);
-                
+
                 byte[] image_to_write = new byte[this.taille];
-                
-                Console.WriteLine("Calcul : "+(pixel_image.GetLength(1) * pixel_image.GetLength(0) * 24) / 8);
+
+                Console.WriteLine("Calcul : " + (pixel_image.GetLength(1) * pixel_image.GetLength(0) * 24) / 8);
 
                 //Console.WriteLine(image_to_write.Length);
 
@@ -137,32 +152,14 @@ namespace PSI_A2
                 //Recalculating size, width and height
                 for (int i = 0; i < 4; i++)
                 {
-                    image_to_write[i + 2] = Convertir_Int_To_Endian(((pixel_image.GetLength(1)*pixel_image.GetLength(0)*24)/8)+this.offset)[i];
+                    image_to_write[i + 2] = Convertir_Int_To_Endian(((pixel_image.GetLength(1) * pixel_image.GetLength(0) * 24) / 8) + this.offset)[i];
                     image_to_write[i + 18] = Convertir_Int_To_Endian(pixel_image.GetLength(1))[i];
                     image_to_write[i + 22] = Convertir_Int_To_Endian(pixel_image.GetLength(0))[i];
-                   
+
 
 
 
                 }
-
-                //Im testing to understand better
-
-               /* for(int i = 0; i < this.offset; i++)
-                {
-                    if (i < 14)
-                    {
-                        Console.Write(image_to_write[i] + " ");
-                    }
-                    else if (i == 14) Console.Write("\n" + image_to_write[i] + " ");
-                    else Console.Write(image_to_write[i] + " ");
-                    
-                }*/
-
-
-
-                
-
 
                 for (int i = 0; i < pixel_image.GetLength(0); i++)
                 {
@@ -176,20 +173,22 @@ namespace PSI_A2
                             image_to_write[this.offset + i * width_to_save + j * 3 + 2] = this.pixel_image[i, j].R;
                         }
 
-                        
+
                     }
 
                 }
 
 
                 File.WriteAllBytes(file, image_to_write);
-                
+
                 Console.WriteLine("Save and Done");
             }
 
         }
 
-
+        /// <summary>
+        /// Fonction de génération de fractale
+        /// </summary>
         public void Fractale()
         {
             int imagex = 3000;
@@ -237,7 +236,11 @@ namespace PSI_A2
             this.pixel_image = fractale;
         }
 
-
+        /// <summary>
+        /// Méthode convertissant un tableau d'octets en little endian en un entier
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
         public int Convertir_Endian_To_Int(byte[] tab)
         {
 
@@ -248,6 +251,12 @@ namespace PSI_A2
             }
             return s;
         }
+
+        /// <summary>
+        /// Convertisseur transformant un entier en un tableau d'octets en little endian
+        /// </summary>
+        /// <param name="entier"></param>
+        /// <returns></returns>
 
         static public byte[] Convertir_Int_To_Endian(long entier)
         {
@@ -272,6 +281,10 @@ namespace PSI_A2
         }
 
 
+
+        /// <summary>
+        /// Fonction transformant notre image en une image en nuance de gris
+        /// </summary>
         public void Nuance_de_Gris()
         {
 
@@ -292,7 +305,9 @@ namespace PSI_A2
             }
 
         }
-
+        /// <summary>
+        /// Fonction transformant notre image en une image en noir et blanc
+        /// </summary>
         public void Noir_et_Blanc()
         {
             for (int i = 0; i < this.pixel_image.GetLength(0); i++)
@@ -324,7 +339,11 @@ namespace PSI_A2
 
 
 
-
+        /// <summary>
+        /// Fonction qui redimensionne l'image selon une nouvelle longueur et largeur entrées en paramètre
+        /// </summary>
+        /// <param name="new_height"></param>
+        /// <param name="new_width"></param>
         public void Resize(int new_height, int new_width)
         {
 
@@ -345,9 +364,14 @@ namespace PSI_A2
 
         }
 
-        public void Rotation(double angle_rad)
+        /// <summary>
+        /// Fonction permettant la rotation de notre image en fonction d'un angle en degré
+        /// </summary>
+        /// <param name="angle_deg"></param>
+
+        public void Rotation(double angle_deg)
         {
-            angle_rad = (angle_rad / 180.0) * Math.PI;
+            angle_deg = (angle_deg / 180.0) * Math.PI;
             int[] center = { this.pixel_image.GetLength(0) / 2, this.pixel_image.GetLength(1) / 2 };
             int new_height = this.pixel_image.GetLength(0) / 2;
             int new_width = this.pixel_image.GetLength(1) / 2;
@@ -362,7 +386,7 @@ namespace PSI_A2
 
 
                     double r = Math.Sqrt(Math.Pow(i - center[0], 2) + Math.Pow(j - center[1], 2));
-                    double theta = Math.Atan2(i - center[0], j - center[1]) + angle_rad;
+                    double theta = Math.Atan2(i - center[0], j - center[1]) + angle_deg;
                     x_max = (x_max < r * Math.Cos(theta)) ? (int)(r * Math.Cos(theta)) : x_max;
                     x_min = (x_min > r * Math.Cos(theta)) ? (int)(r * Math.Cos(theta)) : x_min;
                     y_max = (y_max < r * Math.Sin(theta)) ? (int)(r * Math.Sin(theta)) : y_max;
@@ -381,7 +405,7 @@ namespace PSI_A2
                 for (int j = 0; j < new_matrix.GetLength(1); j++)
                 {
                     double rayon = Math.Sqrt(Math.Pow(i - new_center[0], 2) + Math.Pow(j - new_center[1], 2));
-                    double theta = Math.Atan2(j - new_center[1], i - new_center[0]) - angle_rad;
+                    double theta = Math.Atan2(j - new_center[1], i - new_center[0]) - angle_deg;
                     int new_x = (int)(center[0] + rayon * Math.Cos(theta));
                     int new_y = (int)(center[1] + rayon * Math.Sin(theta));
                     if (new_x >= 0 && new_x < this.pixel_image.GetLength(0) && new_y >= 0 && new_y < this.pixel_image.GetLength(1))
@@ -396,6 +420,11 @@ namespace PSI_A2
 
 
         }
+
+        /// <summary>
+        /// Fonction applique un effet miroir à notre image. Le booléen en paramètre permet d'effectuer l'effet selon l'axe horizontal si True sinon vertical
+        /// </summary>
+        /// <param name="axe_horizontal"></param>
 
         public void Miror(bool axe_horizontal)
         {
@@ -426,6 +455,10 @@ namespace PSI_A2
             this.pixel_image = image_temp;
         }
 
+        /// <summary>
+        /// Fonction applicant un effet de flou
+        /// </summary>
+
         public void Blur()
         {
             int[,] mat_blur = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
@@ -434,25 +467,42 @@ namespace PSI_A2
 
         }
 
+        /// <summary>
+        /// Fonction applicant un effet de détection des bords
+        /// </summary>
         public void Edges_detection()
         {
             int[,] mat = { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
             this.pixel_image = Convolution(mat);
         }
 
+
+        /// <summary>
+        /// Fonction applicant un effet de repoussage
+        /// </summary>
         public void Repoussage()
         {
             int[,] mat = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
             this.pixel_image = Convolution(mat);
         }
 
+
+        /// <summary>
+        /// Fonction applicant un effet de renforcement des bords
+        /// </summary>
         public void EdgesReinforcement()
         {
             int[,] mat = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
             this.pixel_image = Convolution(mat);
         }
 
-
+        /// <summary>
+        /// Fonction permettant d'extraire un certain nombre d'octets (paramètre length) à partir d'une certaine position (paramètre pos) d'un plus grand tableau d'octets
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <param name="pos"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public byte[] TableauByte(byte[] tab, int pos, int length)
         {
 
@@ -464,7 +514,11 @@ namespace PSI_A2
             return retour;
         }
 
-
+        /// <summary>
+        /// Fonction effectuant une convolution de matrice.
+        /// </summary>
+        /// <param name="mat_conv"></param>
+        /// <returns></returns>
         public Pixel[,] Convolution(int[,] mat_conv)
         {
             Pixel[,] new_matrix = new Pixel[pixel_image.GetLength(0), pixel_image.GetLength(1)];
@@ -530,14 +584,17 @@ namespace PSI_A2
         }
 
 
-
+        /// <summary>
+        /// Fonction d'affichage de l'image avec un booléen permettant l'affichage seulement du header si besoin
+        /// </summary>
+        /// <param name="only_header"></param>
         public void Affiche(bool only_header)
         {
 
 
             if (!only_header)
             {
-                
+
 
 
 
@@ -570,6 +627,11 @@ namespace PSI_A2
 
             }
         }
+
+
+        /// <summary>
+        /// Fonction générant un histogramme de couleur
+        /// </summary>
         public void Histogramme()
         {
 
@@ -644,36 +706,44 @@ namespace PSI_A2
 
             this.pixel_image = histo;
         }
-        public int pixel_count(Pixel[,] image, byte temp, string c)
+
+        /// <summary>
+        /// Fonction comptant les pixels pour l'histogramme.
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="temp"></param>
+        /// <param name="color_string"></param>
+        /// <returns></returns>
+        public int pixel_count(Pixel[,] image, byte temp, string color_string)
         {
-            c.ToLower();
+            color_string.ToLower();
             int retour = 0;
             for (int i = 0; i < image.GetLength(0); i++)
             {
                 for (int j = 0; j < image.GetLength(1); j++)
                 {
-                    if (c == "r")
+                    if (color_string == "r")
                     {
                         if (image[i, j].R == temp)
                         {
                             retour++;
                         }
                     }
-                    else if (c == "g")
+                    else if (color_string == "g")
                     {
                         if (image[i, j].G == temp)
                         {
                             retour++;
                         }
                     }
-                    else if (c == "b")
+                    else if (color_string == "b")
                     {
                         if (image[i, j].B == temp)
                         {
                             retour++;
                         }
                     }
-                    else if (c == "grey")
+                    else if (color_string == "grey")
                     {
                         if ((image[i, j].B + image[i, j].G + image[i, j].R) / 3 == temp)
                         {
@@ -685,6 +755,12 @@ namespace PSI_A2
             }
             return retour;
         }
+
+        /// <summary>
+        /// Fonction permettant d'obtenir le max d'un tableau
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
         public int Maximum(int[] tab)
         {
             int retour = 0;
@@ -697,6 +773,12 @@ namespace PSI_A2
             }
             return retour;
         }
+
+
+        /// <summary>
+        /// Fonction cachant l'image 2 dans notre image
+        /// </summary>
+        /// <param name="image2"></param>
         public void HiddenPic(Pixel[,] image2)
         {
             Pixel[,] image_retour = new Pixel[this.pixel_image.GetLength(0), this.pixel_image.GetLength(1)];
@@ -711,6 +793,11 @@ namespace PSI_A2
             }
             this.pixel_image = image_retour;
         }
+
+
+        /// <summary>
+        /// Fonction décodant l'image
+        /// </summary>
         public void Retrouver_image()
         {
             Pixel[,] image_retour = new Pixel[this.pixel_image.GetLength(0), this.pixel_image.GetLength(1)];
@@ -725,6 +812,13 @@ namespace PSI_A2
             }
             this.pixel_image = image_retour;
         }
+
+
+        /// <summary>
+        /// Convertisseur binaire en int
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
         public int Convertir_Binairy_To_Int(int[] tab)
         {
             int s = 0;
@@ -735,6 +829,11 @@ namespace PSI_A2
             return s;
         }
 
+        /// <summary>
+        /// Convertisseur d'un entier en binaire
+        /// </summary>
+        /// <param name="entier"></param>
+        /// <returns></returns>
         public int[] Convertir_Int_To_Binairy(int entier)
         {
             int p = 0;
@@ -761,6 +860,13 @@ namespace PSI_A2
             }
             return retour;
         }
+
+        /// <summary>
+        /// Fonction concaténant 2 tableaux
+        /// </summary>
+        /// <param name="tab1"></param>
+        /// <param name="tab2"></param>
+        /// <returns></returns>
         public int[] Concaténer_tableaux(int[] tab1, int[] tab2)
         {
             int[] retour = new int[8];
@@ -774,6 +880,13 @@ namespace PSI_A2
             }
             return retour;
         }
+
+
+        /// <summary>
+        /// Fonction permettant d'de stocker les 4 premiers bits d'un octet dans un tableau
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
         public int[] Recuperer_tableau(int[] tab)
         {
             int[] retour = new int[8];

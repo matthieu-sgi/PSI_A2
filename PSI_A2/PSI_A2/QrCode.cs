@@ -113,104 +113,68 @@ namespace PSI_A2
         {
 
             bool monte = true;
-
-            int counter = 0;
             string mask = "111011111000100";
+            int counter = 0;
+            
             Console.WriteLine(bits.Length);
-
-
-            for (int j = this.qr.Pixel_image.GetLength(1) - 1; j > 0; j -= 2)
+            int offset = 0;
+            for (int j = 0; j < qr.Pixel_image.GetLength(1) / 2; j++)
             {
 
-                //for (int i = monte ? 0 : this.qr.Pixel_image.GetLength(0) - 1; monte ? i < this.qr.Pixel_image.GetLength(0) : i >= 0; i--)
-                for(int i= this.qr.Pixel_image.GetLength(0) - 1; i >= 0;i--)
+                
+                for (int y = monte ? this.qr.Pixel_image.GetLength(0) - 1 : 0; monte ? y >= 0 : y<this.qr.Pixel_image.GetLength(0);y= monte ? y-- : y++)
                 {
-                    //if((i>7 && j>7) || (i>7 && this.qr.Pixel_image.GetLength(1) -8>j ) 
-                    //||(i< this.qr.Pixel_image.GetLength(0)-8 && j>8) && i!= 6 && j != 6)
-                    if ((i < 9 && j < 9) || (i < 9 && j > this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 9 && j < 8)
-                        || i == 7 || j == 7 || (i > this.qr.Pixel_image.GetLength(0) - 9 && j == 8)) ;
-
-                    else
+                    for (int x = this.qr.Pixel_image.GetLength(0)-offset; x> this.qr.Pixel_image.GetLength(0) - offset-2; x --)
                     {
-                        if (version_2)
-                        {
-                            if ((i < this.qr.Pixel_image.GetLength(0) - 9 || j < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
-                             || j > this.qr.Pixel_image.GetLength(1) - 5))
-                            {
 
-                                Console.Write(counter + " ");
-                                if ((i + j) % 2 == 0 ^ bits[counter] == '0')
+                        
+                        if ((y < 9 && x < 9) || (y < 9 && x > this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 9 && x < 8)
+                            || y == 7 || x == 7 || (y > this.qr.Pixel_image.GetLength(0) - 9 && x == 8)) ;
+
+                        else
+                        {
+                            if (version_2)
+                            {
+                                if ((y < this.qr.Pixel_image.GetLength(0) - 9 || x < this.qr.Pixel_image.GetLength(1) - 9) || (y > this.qr.Pixel_image.GetLength(0) - 5
+                                 || x > this.qr.Pixel_image.GetLength(1) - 5))
                                 {
 
-                                    this.qr.Pixel_image[i, j] = new Pixel("w");
-                                }
-                                else this.qr.Pixel_image[i, j] = new Pixel("b");
-                                counter++;
+                                    Console.Write(counter + " ");
+                                    if ((y + x) % 2 == 0 ^ bits[counter] == '0')
+                                    {
 
+                                        this.qr.Pixel_image[y, x] = new Pixel("w");
+                                    }
+                                    else this.qr.Pixel_image[y, x] = new Pixel("b");
+                                    counter++;
+
+                                }
                             }
-                        }
-                        else if (!version_2)
-                        {
-                            if (counter < bits.Length)
+                            else if (!version_2)
                             {
-                                if ((i + j) % 2 == 0 ^ bits[counter] == '0')
+                                if (counter < bits.Length)
                                 {
+                                    Console.Write(counter + " ");
+                                    if ((y + x) % 2 == 0 ^ bits[counter] == '0')
+                                    {
 
-                                    this.qr.Pixel_image[i, j] = new Pixel("w");
+                                        this.qr.Pixel_image[y, x] = new Pixel("w");
+                                    }
+                                    else this.qr.Pixel_image[y, x] = new Pixel("b");
+                                    counter++;
                                 }
-                                else this.qr.Pixel_image[i, j] = new Pixel("b");
-                                counter++;
+                                else this.qr.Pixel_image[y,x] = new Pixel("b");
                             }
-                            else this.qr.Pixel_image[i, j] = new Pixel("b");
+
+
                         }
-
-
-
-                        //this.qr.Pixel_image[i, j - 1] = new Pixel(150, 150, 150);
-                    }
-                    if ((i < 9 && j - 1 < 9) || (i < 9 && j - 1 > this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 < 8)
-                        || i == 7 || j - 1 == 7 || (i > this.qr.Pixel_image.GetLength(0) - 9 && j - 1 == 8)) { }
-                    else
-                    {
-                        if (version_2)
-                        {
-                            if ((i < this.qr.Pixel_image.GetLength(0) - 9 || j - 1 < this.qr.Pixel_image.GetLength(1) - 9) || (i > this.qr.Pixel_image.GetLength(0) - 5
-                             || j - 1 > this.qr.Pixel_image.GetLength(1) - 5))
-                            {
-                                if ((i + j - 1) % 2 == 0 ^ bits[counter] == '0')
-                                {
-
-                                    this.qr.Pixel_image[i, j - 1] = new Pixel("w");
-                                }
-                                else this.qr.Pixel_image[i, j - 1] = new Pixel("b");
-                                counter++;
-
-                            }
-                        }
-                        else if (!version_2)
-                        {
-                            if (counter < bits.Length)
-                            {
-                                if ((i + j - 1) % 2 == 0 ^ bits[counter] == '0')
-                                {
-
-                                    this.qr.Pixel_image[i, j - 1] = new Pixel("w");
-                                }
-                                else this.qr.Pixel_image[i, j - 1] = new Pixel("b");
-                                counter++;
-                            }
-                            else this.qr.Pixel_image[i, j - 1] = new Pixel("b");
-                        }
+                        
 
                     }
-
-
-
-
-                    //this.qr.Pixel_image[i, j - 1] = new Pixel(150, 150, 150);
-
+                    
                 }
                 monte = !monte;
+                offset += 2;
             }
         }
 
@@ -319,8 +283,8 @@ namespace PSI_A2
         public string String_To_Save(int total_octet, int ec_octet)
         {
             string retour_string = "0010";
-            string specific_octet_1 = "1110110000010001";
-
+            string specific_octet_1 = "11101100";
+            string specific_octet_2 = "00010001";
             //retour_string += BinaryConverterFromInt(this.my_string.Length, 9); //Longueur de la chaine de caractères
             retour_string += Convert.ToString(this.my_string.Length, 2).PadLeft(9, '0');
             int[] result_int = String_To_Int(this.my_string);
@@ -344,17 +308,22 @@ namespace PSI_A2
             {
                 retour_string += 0;
             }
-            string temp = "";
 
+            bool tipe = true;
             //Ajoute les octets spécifiques 
-            for (int i = 0; i < (((total_octet * 8 - retour_string.Length) / 8) - 7) * 8; i++)
+            int init = (total_octet * 8 - retour_string.Length) / 8;
+            for (int i = 0; i < init; i++)
             {
-                temp += specific_octet_1[(i) % 16];
+                if (!tipe) retour_string += specific_octet_2;
+                else retour_string += specific_octet_1;
+                tipe = !tipe;
 
             }
-            retour_string += temp;
 
+            Console.WriteLine(retour_string.Length);
+            Console.WriteLine(retour_string);
             byte[] buff = String_To_ByteArray(retour_string);
+
             byte[] ecc = ReedSolomonAlgorithm.Encode(buff, ec_octet, ErrorCorrectionCodeType.QRCode);
             for (int i = 0; i < ecc.Length; i++)
             {
@@ -362,7 +331,7 @@ namespace PSI_A2
             }
             //Console.WriteLine(retour_string+"\n"+retour_string.Length);
             //Console.WriteLine(retour_string + "\n" + retour_string.Length);
-            //Console.WriteLine(String.Join(" ", ecc));
+            Console.WriteLine(String.Join(" ", ecc));
 
             return retour_string;
         }
