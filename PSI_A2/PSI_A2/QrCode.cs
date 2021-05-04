@@ -8,7 +8,6 @@ namespace PSI_A2
 
         private string writing_path;
         private MyImage qr;
-        private bool[,] modif;
         private bool save;
 
 
