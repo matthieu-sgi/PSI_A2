@@ -2,7 +2,7 @@
 
 namespace PSI_A2
 {
-    class QrCode
+    public class QrCode
     {
         private string my_string;
 
@@ -37,7 +37,7 @@ namespace PSI_A2
             byte[] header = new byte[54];
             for (int i = 0; i < 4; i++)
             {
-                byte[] tab_temp = { 0, 18, 11, 0 };
+                
                 header[10 + i] = MyImage.Convertir_Int_To_Endian(54)[i];
                 header[14 + i] = MyImage.Convertir_Int_To_Endian(40)[i];
                 header[38 + i] = MyImage.Convertir_Int_To_Endian(1000)[i];
@@ -171,7 +171,7 @@ namespace PSI_A2
                                  || x > this.qr.Pixel_image.GetLength(1) - 5))
                                 {
 
-                                    Console.Write(counter + " ");
+                                    
                                     if (bits.Length <= counter)
                                     {
                                         this.qr.Pixel_image[y, x] = new Pixel("b");
@@ -189,7 +189,7 @@ namespace PSI_A2
                             else if (!version_2)
                             {
 
-                                Console.Write(counter + " ");
+                                
 
                                 if (bits[counter] == '0')
                                 {
@@ -262,7 +262,7 @@ namespace PSI_A2
                             else if (!version_2)
                             {
 
-                                Console.Write(counter + " ");
+                                
 
                                 if ((x + y) % 2 == 0 ^ this.qr.Pixel_image[y, x].IsWhite)
                                 {
@@ -332,7 +332,7 @@ namespace PSI_A2
 
 
         /// <summary>
-        /// Fonction ajoutant le motif de recherche pour la version 2 du QRCode
+        /// Fonction ajoutant le motif de recherche pour les autres versions que la 1 du QRCode
         /// </summary>
         /// <param name="qr"></param>
         private void MandatoryPart_V2(Pixel[,] qr)
@@ -383,6 +383,14 @@ namespace PSI_A2
                 this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
                 Encoding(String_To_Save(55, 15), true);
 
+            }
+            else if (this.my_string.Length >77 && this.my_string.Length < 115)
+            {
+                Pixel[,] pixel_qr = new Pixel[33, 33];
+                Mutual_Part(pixel_qr);
+                MandatoryPart_V2(pixel_qr);
+                this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
+                Encoding(String_To_Save(80, 20), true);
             }
             else
             {

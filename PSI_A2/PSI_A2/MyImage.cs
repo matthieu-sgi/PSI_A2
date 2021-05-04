@@ -4,7 +4,7 @@ using System.IO;
 
 namespace PSI_A2
 {
-    class MyImage
+    public class MyImage
     {
         private string type;
         private int taille;
@@ -631,79 +631,93 @@ namespace PSI_A2
         /// <summary>
         /// Fonction générant un histogramme de couleur
         /// </summary>
-        public void Histogramme()
+        public void Histogramme(int type)
         {
-
-
-            Pixel rouge = new Pixel(255, 0, 0);
-            Pixel vert = new Pixel(0, 255, 0);
-            Pixel bleu = new Pixel(0, 0, 255);
-            Pixel gris = new Pixel(172, 172, 172);
-
-            int[] tab_red = new int[256];
-            int[] tab_green = new int[256];
-            int[] tab_blue = new int[256];
-            int[] tab_grey = new int[256];
-
-            for (int i = 0; i < tab_red.Length; i++)
+            if (type == 1)
             {
-                tab_red[i] = pixel_count(pixel_image, (byte)(i), "r") / 10;
-            }
-            for (int i = 0; i < tab_green.Length; i++)
-            {
-                tab_green[i] = pixel_count(pixel_image, (byte)(i), "g") / 10;
-            }
-            for (int i = 0; i < tab_blue.Length; i++)
-            {
-                tab_blue[i] = pixel_count(pixel_image, (byte)(i), "b") / 10;
-            }
-            for (int i = 0; i < tab_grey.Length; i++)
-            {
-                tab_grey[i] = pixel_count(pixel_image, (byte)(i), "grey") / 10;
-            }
+                Pixel rouge = new Pixel(255, 0, 0);
+                Pixel vert = new Pixel(0, 255, 0);
+                Pixel bleu = new Pixel(0, 0, 255);
 
+                int[] tab_red = new int[256];
+                int[] tab_green = new int[256];
+                int[] tab_blue = new int[256];
 
-
-            int max = 0;
-
-            max = (Maximum(tab_red) > Maximum(tab_green)) ? Maximum(tab_red) : Maximum(tab_green);
-            max = (max > Maximum(tab_blue)) ? max : Maximum(tab_blue);
-            max = (max > Maximum(tab_grey)) ? max : Maximum(tab_grey);
-
-            Pixel[,] histo = new Pixel[max, 4 * 256 + 30];
-
-            for (int j = 0; j < 256; j++)
-            {
-                for (int n = 0; n < tab_red[j]; n++)
+                for (int i = 0; i < tab_red.Length; i++)
                 {
-                    histo[n, j] = rouge;
+                    tab_red[i] = pixel_count(pixel_image, (byte)(i), "r") / 10;
                 }
-            }
-            for (int j = 256 + 10; j < 256 + 10 + 256; j++)
-            {
-                for (int n = 0; n < tab_green[j - 256 - 10]; n++)
+                for (int i = 0; i < tab_green.Length; i++)
                 {
-                    histo[n, j] = vert;
+                    tab_green[i] = pixel_count(pixel_image, (byte)(i), "g") / 10;
                 }
-            }
-            for (int j = 256 + 10 + 256 + 10; j < 256 + 10 + 256 + 10 + 256; j++)
-            {
-                for (int n = 0; n < tab_blue[j - 256 - 10 - 256 - 10]; n++)
+                for (int i = 0; i < tab_blue.Length; i++)
                 {
-                    histo[n, j] = bleu;
+                    tab_blue[i] = pixel_count(pixel_image, (byte)(i), "b") / 10;
                 }
+
+                int max = 0;
+
+                max = (Maximum(tab_red) > Maximum(tab_green)) ? Maximum(tab_red) : Maximum(tab_green);
+                max = (max > Maximum(tab_blue)) ? max : Maximum(tab_blue);
+
+                Pixel[,] histo = new Pixel[max, 3 * 256 + 20];
+
+                for (int j = 0; j < 256; j++)
+                {
+                    for (int n = 0; n < tab_red[j]; n++)
+                    {
+                        histo[n, j] = rouge;
+                    }
+                }
+                for (int j = 256 + 10; j < 256 + 10 + 256; j++)
+                {
+                    for (int n = 0; n < tab_green[j - 256 - 10]; n++)
+                    {
+                        histo[n, j] = vert;
+                    }
+                }
+                for (int j = 256 + 10 + 256 + 10; j < 256 + 10 + 256 + 10 + 256; j++)
+                {
+                    for (int n = 0; n < tab_blue[j - 256 - 10 - 256 - 10]; n++)
+                    {
+                        histo[n, j] = bleu;
+                    }
+                }
+                this.pixel_image = histo;
+            }
+            else if (type == 2)
+            {
+                Pixel gris = new Pixel(172, 172, 172);
+
+
+                int[] tab_grey = new int[256];
+
+
+                for (int i = 0; i < tab_grey.Length; i++)
+                {
+                    tab_grey[i] = pixel_count(pixel_image, (byte)(i), "grey") / 10;
+                }
+
+                Pixel[,] histo = new Pixel[Maximum(tab_grey), 256];
+
+                for (int j = 0; j < 256; j++)
+                {
+                    for (int n = 0; n < tab_grey[j]; n++)
+                    {
+                        histo[n, j] = gris;
+                    }
+                }
+                this.pixel_image = histo;
+            }
+            else
+            {
+
+                Console.WriteLine("Veuillez rentrer Couleurs ou Grey");
             }
 
-            for (int j = 256 + 10 + 256 + 10 + 256 + 10; j < 256 + 10 + 256 + 10 + 256 + 10 + 256; j++)
-            {
-                for (int n = 0; n < tab_grey[j - 256 - 10 - 256 - 10 - 256 - 10]; n++)
-                {
-                    histo[n, j] = gris;
-                }
-            }
 
 
-            this.pixel_image = histo;
         }
 
         /// <summary>

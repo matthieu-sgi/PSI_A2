@@ -4,14 +4,14 @@
 
 namespace PSI_A2
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
 
 
-            string path = @"..\..\..\Images\tigre.bmp";
-            string writing_path = @"..\..\..\Images\test.bmp";
+            string path = @"..\..\..\Images\";
+            string writing_path = @"..\..\..\Images\";
 
 
 
@@ -20,26 +20,35 @@ namespace PSI_A2
 
 
             string exit="";
-            /*Console.WriteLine("Veuillez entrer le nom du fichier de résultat en spécifiant l'extension (.bmp) : ");
+            Console.WriteLine("Veuillez entrer le nom du fichier de sortie : ");
             string nom_image = Console.ReadLine();
-            writing_path += nom_image;
+            string test = "";
+            for(int i = nom_image.Length -4; i< nom_image.Length && nom_image.Length>0; i++)
+            {
+                test += nom_image[i];
+            }
+            if (test != ".bmp" || nom_image.Length == 0) writing_path += nom_image + ".bmp";
+            else writing_path += nom_image;
+            
 
             Console.WriteLine("Veuillez entrer le nom de votre image placée dans le dossier \"Images\" du projet, veuillez spécifier l'extension (.bmp)" +
-                "\nSi vous ne remplissez rien, l'image léna sera chargée");
+                "\nSi vous ne remplissez rien, l'image léna sera chargée (pour le qrcode vous pouvez simplement appuyer sur enter");
             nom_image = Console.ReadLine();
             if (nom_image.Length == 0)
             {
                 path += "lena.bmp";
+                nom_image = "lena.bmp";
 
             }
-            else path += nom_image;*/
+            else path += nom_image;
             MyImage image = new MyImage(path);
-
+            Console.WriteLine("Vous avez choisi " + nom_image + " !\nAmusez-vous bien !");
 
             #region Menu sympathique
 
             while (exit != "exit" && image.Right_File)
             {
+                
                 Console.WriteLine("Que voulez vous faire ? (veuillez entrer un nombre)\n1- Afficher les bytes de l'image"
                                     + "\n2- Effet miroir avec axe de symétrie horizontal" +
                                     "\n3- Effet miroir avec axe de symétrie vertical" +
@@ -51,9 +60,11 @@ namespace PSI_A2
                                     "\n9- Détection des contours" +
                                     "\n10- Repoussage" +
                                     "\n11- Renforcement des bords" +
-                                    "\n12- Histogramme" +
-                                    "\n13- QrCode"+
-                                    "\nEntrer \"exit\" pour quitter");
+                                    "\n12- Fractale" +
+                                    "\n13- Histogramme" +
+                                    "\n14- Stéganographie" +
+                                    "\n15- QrCode" +
+                                    "\nEntrer \"exit\" pour quitter ou faites ctrl + c");
                 exit = Console.ReadLine();
                 switch (exit)
                 {
@@ -146,7 +157,7 @@ namespace PSI_A2
                         Console.Clear();
                         break;
                     case "9":
-                        
+
                         image.Edges_detection();
                         image.FromImageToFile(writing_path);
                         Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
@@ -154,7 +165,7 @@ namespace PSI_A2
                         Console.Clear();
                         break;
                     case "10":
-                        
+
                         image.Repoussage();
                         image.FromImageToFile(writing_path);
                         Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
@@ -162,7 +173,7 @@ namespace PSI_A2
                         Console.Clear();
                         break;
                     case "11":
-                        
+
                         image.EdgesReinforcement();
                         image.FromImageToFile(writing_path);
                         Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
@@ -170,22 +181,84 @@ namespace PSI_A2
                         Console.Clear();
                         break;
                     case "12":
-                        image.Histogramme();
+                        image.Fractale();
                         image.FromImageToFile(writing_path);
                         Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
-                    case "13" : 
+                    case "13":
+                        Console.WriteLine("Entrez le type d'histogramme souhaité");
+                        Console.WriteLine("- 1) pour l'histogramme RGB");
+                        Console.WriteLine("- 2) pour l'histogramme nuance de gris");
+                        int type = Convert.ToInt32(Console.ReadLine());
+
+                        if (type == 1 || type == 2)
+                        {
+                            image.Histogramme(type);
+                            image.FromImageToFile(writing_path);
+                            Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
+                            Console.ReadKey();
+                            Console.Clear();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Rentrez un nombre valide.");
+                            Console.ReadKey();
+                        }
+                        break;
+                    case "14":
+                        Console.WriteLine("Voulez-vous : ");
+                        Console.WriteLine("- 1) Cacher une image dans l'image sélectionner.");
+                        Console.WriteLine("- 2) Retrouver l'image cachée dans l'image sélectionnée.");
+                        int choix = Convert.ToInt32(Console.ReadLine());
+
+                        if (choix == 1)
+                        {
+                            Console.WriteLine("Quelle image souhaitez-vous cacher (veuillez entrer le nom du fichier en spécifiant l'extension (.bmp))?");
+                            string s = Console.ReadLine();
+                            string path2 = @"..\..\..\Images\" + s;
+                            string writing_path2 = @"..\..\..\Images\image_cachee.bmp";
+                            
+                            MyImage image2 = new MyImage(path2);
+
+                            if (image2.Right_File)
+                            {
+                                image2.Resize(image.Pixel_image.GetLength(0), image.Pixel_image.GetLength(1));
+                                Pixel[,] imagecachée = image2.Pixel_image;
+                                image.HiddenPic(imagecachée);
+                                image.FromImageToFile(writing_path2);
+                                Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
+                                Console.ReadKey();
+                            }
+                            Console.Clear();
+                        }
+                        else if (choix == 2)
+                        {
+                            string writing_path3 = @"..\..\..\Images\image_retrouvee.bmp";
+                            image.Retrouver_image();
+                            image.FromImageToFile(writing_path3);
+                            Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
+                            Console.ReadKey();
+                            Console.Clear();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Rentrez un nombre valide.");
+                            Console.ReadKey();
+                        }
+                        break;
+                    case "15":
                         Console.WriteLine("Quel string voulez-vous cacher (alphanumérique seulement) ?");
-                        QrCode qrcode = new QrCode(Console.ReadLine(),writing_path);
+                        QrCode qrcode = new QrCode(Console.ReadLine(), writing_path);
                         qrcode.Qr_Save();
                         Console.WriteLine("Saved and done...(presser un bouton pour revenir au menu)");
                         Console.ReadKey();
                         Console.Clear();
                         break;
-
-                     case "exit":
+                    case "exit":
                         Console.WriteLine("Au revoir");
                         Console.ReadKey();
                         break;
@@ -200,9 +273,9 @@ namespace PSI_A2
             }
             #endregion
 
-            
 
-            
+
+
             Console.ReadKey();
         }
     }

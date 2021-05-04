@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PSI_A2
 {
-    struct Pixel
+    public struct Pixel
     {
         private byte r;
         private byte g;
