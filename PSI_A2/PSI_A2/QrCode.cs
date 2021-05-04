@@ -9,6 +9,7 @@ namespace PSI_A2
         private string writing_path;
         private MyImage qr;
         private bool[,] modif;
+        private bool save;
 
 
         /// <summary>
@@ -22,7 +23,7 @@ namespace PSI_A2
             this.my_string = _my_string.ToUpper();
             this.writing_path = writing_path;
 
-
+            this.save = true;
 
             QrCode_Generator();
         }
@@ -63,16 +64,19 @@ namespace PSI_A2
 
         public void Qr_Save()
         {
-            Pixel[,] temp = new Pixel[qr.Pixel_image.GetLength(0), qr.Pixel_image.GetLength(1)];
-            for (int i = 0; i < temp.GetLength(0); i++)
+            if (this.save)
             {
-                for (int j = 0; j < temp.GetLength(1); j++)
+                Pixel[,] temp = new Pixel[qr.Pixel_image.GetLength(0), qr.Pixel_image.GetLength(1)];
+                for (int i = 0; i < temp.GetLength(0); i++)
                 {
-                    temp[i, j] = this.qr.Pixel_image[temp.GetLength(0) - 1 - i, j];
+                    for (int j = 0; j < temp.GetLength(1); j++)
+                    {
+                        temp[i, j] = this.qr.Pixel_image[temp.GetLength(0) - 1 - i, j];
+                    }
                 }
+                this.qr.Pixel_image = temp;
+                this.qr.FromImageToFile(this.writing_path);
             }
-            this.qr.Pixel_image = temp;
-            this.qr.FromImageToFile(this.writing_path);
         }
 
 
@@ -214,11 +218,11 @@ namespace PSI_A2
                     offset++;
                 }
             }
-            
+
             offset = 0;
             counter = 0;
 
-            
+
             //Boucle appliquant le masque au QrCode
             for (int j = 0; j < (this.qr.Pixel_image.GetLength(1) / 2); j++)
             {
@@ -353,7 +357,7 @@ namespace PSI_A2
 
         public void QrCode_Generator()
         {
-            
+
             if (this.my_string.Length < 26)
             {
                 Pixel[,] pixel_qr = new Pixel[21, 21];
@@ -372,7 +376,20 @@ namespace PSI_A2
 
 
             }
-            else Console.WriteLine("La chaîne de caractère entrée est trop longue");
+            else if (this.my_string.Length > 47 && this.my_string.Length < 78)
+            {
+                Pixel[,] pixel_qr = new Pixel[29, 29];
+                Mutual_Part(pixel_qr);
+                MandatoryPart_V2(pixel_qr);
+                this.qr = new MyImage("BM", 54, Header_Generator(), pixel_qr);
+                Encoding(String_To_Save(55, 15), true);
+
+            }
+            else
+            {
+                Console.WriteLine("La chaîne de caractère entrée est trop longue");
+                save = false;
+            }
 
 
 
@@ -488,7 +505,7 @@ namespace PSI_A2
 
             }
 
-            
+
             byte[] buff = String_To_ByteArray(retour_string);
 
             byte[] ecc = ReedSolomonAlgorithm.Encode(buff, ec_octet, ErrorCorrectionCodeType.QRCode);
@@ -498,7 +515,7 @@ namespace PSI_A2
             }
             //Console.WriteLine(retour_string+"\n"+retour_string.Length);
             //Console.WriteLine(retour_string + "\n" + retour_string.Length);
-           
+
 
             return retour_string;
         }
@@ -575,7 +592,7 @@ namespace PSI_A2
             return binary;
         }
 
-        
+
         /// <summary>
         /// Transforme un string en un tableau d'octets
         /// </summary>
